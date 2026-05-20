@@ -1,6 +1,7 @@
 import TopNavigation from '@/components/TopNavigation'
 import { useWorkspaceView } from '@/store'
 import CodeViewLayout from './CodeViewLayout'
+import VisualViewLayout from './VisualViewLayout'
 
 const AppLayout = () => {
   const { activeView, setActiveView } = useWorkspaceView()
@@ -18,11 +19,7 @@ const AppLayout = () => {
       {activeView === 'code' ? (
         <CodeViewLayout />
       ) : (
-        <main className="flex min-h-0 flex-1 items-center justify-center px-6">
-          <div className="text-[#6B7390] text-sm text-center max-w-xl">
-            Visual View is coming soon.
-          </div>
-        </main>
+        <VisualViewLayout />
       )}
     </div>
   )
