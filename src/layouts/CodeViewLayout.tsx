@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import MonacoWorkspaceContainer from '@/components/MonacoWorkspaceContainer'
 
 type FileTreeItem = {
   id: string
@@ -55,6 +56,16 @@ const fileTree: FileTreeItem[] = [
 ]
 
 const initialExpandedFolders = new Set(['src', 'src/components', 'src/layouts'])
+
+const editorPreviewSource = `// Obsera Code View
+// Inspect project files and understand source structure in context.
+
+function helloWorld() {
+  console.log('Welcome to Obsera')
+}
+
+export default helloWorld
+`
 
 const FolderIcon = () => (
   <svg className="h-4 w-4 shrink-0 text-[#6EA8FF]" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -211,25 +222,11 @@ const CodeViewLayout = () => {
           </div>
 
           <div className="flex min-h-0 flex-1 overflow-hidden p-3 sm:p-5">
-            <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border border-[#1E293B] bg-[#0B1020] shadow-inner shadow-black/40">
-              <div className="flex h-10 shrink-0 items-center border-b border-[#1E293B] bg-[#131D33] px-4 text-sm text-[#E6EAF5]">
-                <span className="font-medium">{activeFileName}</span>
-              </div>
-
-              <div className="min-h-0 flex-1 overflow-auto bg-[#09101F] p-4 text-sm leading-6 text-[#CBD5E1]">
-                <pre className="whitespace-pre-wrap break-words">
-{`// Obsera Code View
-// Inspect project files and understand source structure in context.
-
-function helloWorld() {
-  console.log('Welcome to Obsera')
-}
-
-export default helloWorld
-`}
-                </pre>
-              </div>
-            </div>
+            <MonacoWorkspaceContainer
+              fileName={activeFileName}
+              filePath={activeFileId}
+              source={editorPreviewSource}
+            />
           </div>
         </section>
       </div>
