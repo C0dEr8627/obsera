@@ -1,12 +1,13 @@
 import TopNavigation from '@/components/TopNavigation'
 import { useWorkspaceView } from '@/store'
+import CodeViewLayout from './CodeViewLayout'
 
 const AppLayout = () => {
   const { activeView, setActiveView } = useWorkspaceView()
 
   return (
-    <div className="min-h-screen bg-[#0B1020] text-[#E6EAF5]">
-      <header className="h-14 border-b border-[#1E293B] bg-[#121A33] px-6 flex flex-col gap-2 py-3 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex h-screen flex-col overflow-hidden bg-[#0B1020] text-[#E6EAF5]">
+      <header className="flex shrink-0 flex-col gap-2 border-b border-[#1E293B] bg-[#121A33] px-4 py-3 sm:h-14 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-0">
         <h1 className="text-lg font-semibold tracking-wide">
           Obsera
         </h1>
@@ -14,11 +15,15 @@ const AppLayout = () => {
         <TopNavigation activeView={activeView} onChange={setActiveView} />
       </header>
 
-      <main className="h-[calc(100vh-56px)] flex items-center justify-center px-6">
-        <div className="text-[#6B7390] text-sm text-center max-w-xl">
-          {activeView === 'code' ? 'Code View is currently active.' : 'Visual View is currently active.'}
-        </div>
-      </main>
+      {activeView === 'code' ? (
+        <CodeViewLayout />
+      ) : (
+        <main className="flex min-h-0 flex-1 items-center justify-center px-6">
+          <div className="text-[#6B7390] text-sm text-center max-w-xl">
+            Visual View is coming soon.
+          </div>
+        </main>
+      )}
     </div>
   )
 }
