@@ -1,8 +1,8 @@
-import { useState } from 'react'
-import TopNavigation, { type WorkspaceView } from '@/components/TopNavigation'
+import TopNavigation from '@/components/TopNavigation'
+import { useWorkspaceView } from '@/store'
 
 const AppLayout = () => {
-  const [activeView, setActiveView] = useState<WorkspaceView>('code')
+  const { activeView, setActiveView } = useWorkspaceView()
 
   return (
     <div className="min-h-screen bg-[#0B1020] text-[#E6EAF5]">
