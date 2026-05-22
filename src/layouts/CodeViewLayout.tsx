@@ -8,16 +8,6 @@ import {
 
 const initialExpandedFolders = new Set(['src', 'src/components', 'src/layouts'])
 
-const editorPreviewSource = `// Obsera Code View
-// Inspect project files and understand source structure in context.
-
-function helloWorld() {
-  console.log('Welcome to Obsera')
-}
-
-export default helloWorld
-`
-
 const FolderIcon = () => (
   <svg
     className="h-4 w-4 shrink-0 text-[#6EA8FF]"
@@ -146,13 +136,46 @@ const getAllFolderIds = (items: FileTreeItem[]): string[] => {
   return folderIds
 }
 
+const findFileNodeById = (
+  items: FileTreeItem[],
+  fileId: string | null,
+): FileTreeItem | null => {
+  if (!fileId) {
+    return null
+  }
+
+  for (const item of items) {
+    if (item.type === 'file' && item.id === fileId) {
+      return item
+    }
+
+    if (item.type === 'folder') {
+      const childMatch = findFileNodeById(item.children, fileId)
+
+      if (childMatch) {
+        return childMatch
+      }
+    }
+  }
+
+  return null
+}
+
 const CodeViewLayout = () => {
   const [expandedFolders, setExpandedFolders] = useState(initialExpandedFolders)
   const { fileTree, activeFileId, setActiveFileId } = useFileTree()
   const zipFileName = useAppStore((state) => state.zipFileName)
 
-  const activeFilePath = activeFileId ?? 'No file selected'
-  const activeFileName = activeFileId?.split('/').at(-1) ?? 'No file selected'
+  const activeFile = findFileNodeById(fileTree, activeFileId)
+  const activeFilePath = activeFile?.path ?? 'No file selected'
+  const activeFileName = activeFile?.name ?? 'No file selected'
+  const activeFileSource =
+    activeFile?.type === 'file' && typeof activeFile.content === 'string'
+      ? activeFile.content
+      : null
+  const editorEmptyMessage = activeFile
+    ? 'This file is selected, but no readable text content is available for preview.'
+    : 'Select a source file from the file tree to preview its contents.'
 
   const toggleFolder = (id: string) => {
     setExpandedFolders((currentFolders) => {
@@ -258,7 +281,8 @@ const CodeViewLayout = () => {
             <MonacoWorkspaceContainer
               fileName={activeFileName}
               filePath={activeFilePath}
-              source={editorPreviewSource}
+              source={activeFileSource}
+              emptyMessage={editorEmptyMessage}
             />
           </div>
         </section>
