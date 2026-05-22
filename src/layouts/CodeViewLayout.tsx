@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import MonacoWorkspaceContainer from '@/components/MonacoWorkspaceContainer'
+import { useWorkspaceView } from '@/store'
 
 type FileTreeItem = {
   id: string
@@ -179,6 +180,7 @@ const getAllFolderIds = (items: FileTreeItem[]): string[] => {
 const CodeViewLayout = () => {
   const [expandedFolders, setExpandedFolders] = useState(initialExpandedFolders)
   const [activeFileId, setActiveFileId] = useState('src/layouts/CodeViewLayout.tsx')
+  const { zipFileName } = useWorkspaceView()
 
   const activeFileName = activeFileId.split('/').at(-1) ?? activeFileId
 
@@ -223,7 +225,7 @@ const CodeViewLayout = () => {
         <aside className="flex min-h-0 max-h-48 w-full shrink-0 flex-col rounded-lg border border-[#1E293B] bg-[#0F172A] shadow-[0_20px_45px_-30px_rgba(15,23,42,0.9)] lg:max-h-none lg:w-64">
           <div className="flex items-center justify-between gap-3">
             <div className="px-3 py-3">
-              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#A6B0CF]">File Explorer</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#A6B0CF]">{zipFileName || 'File Explorer'}</p>
               <p className="mt-1 text-xs text-[#8EA1C3]">Repository source tree</p>
             </div>
             <div className="mr-3 flex items-center gap-2">

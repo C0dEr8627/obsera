@@ -6,6 +6,8 @@ export interface WorkspaceViewState {
   activeView: WorkspaceView
   setActiveView: (view: WorkspaceView) => void
   toggleView: () => void
+  zipFileName: string | null
+  setZipFileName: (fileName: string | null) => void
 }
 
 const STORAGE_KEY = 'obsera.activeWorkspaceView'
@@ -26,6 +28,7 @@ const WorkspaceViewContext = createContext<WorkspaceViewState | undefined>(undef
 
 export const WorkspaceViewProvider = ({ children }: PropsWithChildren) => {
   const [activeView, setActiveViewState] = useState<WorkspaceView>(getInitialWorkspaceView)
+  const [zipFileName, setZipFileNameState] = useState<string | null>(null)
 
   useEffect(() => {
     try {
@@ -43,8 +46,12 @@ export const WorkspaceViewProvider = ({ children }: PropsWithChildren) => {
     setActiveViewState((current) => (current === 'code' ? 'visual' : 'code'))
   }, [])
 
+  const setZipFileName = useCallback((fileName: string | null) => {
+    setZipFileNameState(fileName)
+  }, [])
+
   return (
-    <WorkspaceViewContext.Provider value={{ activeView, setActiveView, toggleView }}>
+    <WorkspaceViewContext.Provider value={{ activeView, setActiveView, toggleView, zipFileName, setZipFileName }}>
       {children}
     </WorkspaceViewContext.Provider>
   )
