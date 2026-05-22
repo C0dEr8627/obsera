@@ -1,5 +1,9 @@
 import JSZip from 'jszip'
 import type { FileNode } from '@/types/fileNode'
+import {
+  buildFileTree,
+  type ExtractedFileInput,
+} from '@/utils/fileTreeGenerator'
 
 export interface ZipReadSummary {
   fileCount: number
@@ -203,132 +207,6 @@ const isSupportedFilePath = (path: string) => {
 
 const isSupportedFolderPath = (path: string) => !isIgnoredPath(path)
 
-const sortFileTree = (nodes: FileNode[]): FileNode[] =>
-  [...nodes]
-    .map((node) =>
-      node.type === 'folder'
-        ? {
-            ...node,
-            children: sortFileTree(node.children),
-          }
-        : node,
-    )
-    .sort((firstNode, secondNode) => {
-      if (firstNode.type !== secondNode.type) {
-        return firstNode.type === 'folder' ? -1 : 1
-      }
-
-      return firstNode.name.localeCompare(secondNode.name)
-    })
-
-const removeEmptyFolders = (nodes: FileNode[]): FileNode[] =>
-  nodes.reduce<FileNode[]>((filteredNodes, node) => {
-    if (node.type === 'file') {
-      filteredNodes.push(node)
-      return filteredNodes
-    }
-
-    const children = removeEmptyFolders(node.children)
-
-    if (children.length === 0) {
-      return filteredNodes
-    }
-
-    filteredNodes.push({
-      ...node,
-      children,
-    })
-
-    return filteredNodes
-  }, [])
-
-const findOrCreateFolder = (
-  siblings: FileNode[],
-  name: string,
-  path: string,
-) => {
-  const existingFolder = siblings.find(
-    (node) => node.type === 'folder' && node.path === path,
-  )
-
-  if (existingFolder?.type === 'folder') {
-    return existingFolder
-  }
-
-  const folder = {
-    id: path,
-    name,
-    path,
-    type: 'folder',
-    metadata: {},
-    children: [],
-  } satisfies FileNode
-
-  siblings.push(folder)
-  return folder
-}
-
-const addFileToTree = (tree: FileNode[], path: string, content: string) => {
-  const pathParts = path.split('/').filter(Boolean)
-
-  if (pathParts.length === 0) {
-    return
-  }
-
-  let siblings = tree
-  const folders = pathParts.slice(0, -1)
-
-  folders.forEach((folderName, index) => {
-    const folderPath = pathParts.slice(0, index + 1).join('/')
-    const folder = findOrCreateFolder(siblings, folderName, folderPath)
-    siblings = folder.children
-  })
-
-  const fileName = pathParts.at(-1)
-
-  if (!fileName) {
-    return
-  }
-
-  const existingFileIndex = siblings.findIndex(
-    (node) => node.type === 'file' && node.path === path,
-  )
-  const fileNode = {
-    id: path,
-    name: fileName,
-    path,
-    type: 'file',
-    metadata: {
-      extension: getFileExtension(fileName),
-      isText: true,
-    },
-    content,
-  } satisfies FileNode
-
-  if (existingFileIndex >= 0) {
-    siblings[existingFileIndex] = fileNode
-    return
-  }
-
-  siblings.push(fileNode)
-}
-
-const addFolderToTree = (tree: FileNode[], path: string) => {
-  const pathParts = path.split('/').filter(Boolean)
-
-  if (pathParts.length === 0) {
-    return
-  }
-
-  let siblings = tree
-
-  pathParts.forEach((folderName, index) => {
-    const folderPath = pathParts.slice(0, index + 1).join('/')
-    const folder = findOrCreateFolder(siblings, folderName, folderPath)
-    siblings = folder.children
-  })
-}
-
 export const readZipSummary = async (file: File): Promise<ZipReadSummary> => {
   const archive = await JSZip.loadAsync(await file.arrayBuffer())
   const folders = Object.values(archive.files).filter((entry) => {
@@ -340,16 +218,21 @@ export const readZipSummary = async (file: File): Promise<ZipReadSummary> => {
     isSupportedFilePath(normalizeZipPath(entry.name)),
   )
   const sampleFile = files[0] ?? null
-  const fileTree: FileNode[] = []
-
-  for (const entry of folders) {
-    addFolderToTree(fileTree, normalizeZipPath(entry.name))
-  }
+  const extractedFiles: ExtractedFileInput[] = []
 
   for (const entry of files) {
     const path = normalizeZipPath(entry.name)
     const content = await entry.async('string')
-    addFileToTree(fileTree, path, content)
+    const fileName = getPathParts(path).at(-1) ?? ''
+
+    extractedFiles.push({
+      path,
+      content,
+      metadata: {
+        extension: getFileExtension(fileName),
+        isText: true,
+      },
+    })
   }
 
   return {
@@ -357,6 +240,12 @@ export const readZipSummary = async (file: File): Promise<ZipReadSummary> => {
     ignoredFileCount: allFiles.length - files.length,
     sampleFileName: sampleFile?.name ?? null,
     sampleFileContent: sampleFile ? await sampleFile.async('string') : null,
-    fileTree: sortFileTree(removeEmptyFolders(fileTree)),
+    fileTree: buildFileTree({
+      folders: folders.map((entry) => ({
+        path: normalizeZipPath(entry.name),
+      })),
+      files: extractedFiles,
+      pruneEmptyFolders: true,
+    }),
   }
 }
