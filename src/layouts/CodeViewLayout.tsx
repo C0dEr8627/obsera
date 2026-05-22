@@ -157,6 +157,25 @@ const FileTreeNode = ({
   )
 }
 
+// Helper function to recursively get all folder IDs from the file tree
+const getAllFolderIds = (items: FileTreeItem[]): string[] => {
+  const folderIds: string[] = []
+
+  const traverse = (items: FileTreeItem[]) => {
+    for (const item of items) {
+      if (item.type === 'folder') {
+        folderIds.push(item.id)
+        if (item.children) {
+          traverse(item.children)
+        }
+      }
+    }
+  }
+
+  traverse(items)
+  return folderIds
+}
+
 const CodeViewLayout = () => {
   const [expandedFolders, setExpandedFolders] = useState(initialExpandedFolders)
   const [activeFileId, setActiveFileId] = useState('src/layouts/CodeViewLayout.tsx')
@@ -177,6 +196,27 @@ const CodeViewLayout = () => {
     })
   }
 
+  // Get all folder IDs and determine if all are collapsed
+  const allFolderIds = getAllFolderIds(fileTree)
+  const allFoldersCollapsed = allFolderIds.length === 0 || allFolderIds.every((id) => !expandedFolders.has(id))
+
+  const expandAll = () => {
+    const allFolders = new Set(allFolderIds)
+    setExpandedFolders(allFolders)
+  }
+
+  const collapseAll = () => {
+    setExpandedFolders(new Set())
+  }
+
+  const toggleAllFolders = () => {
+    if (allFoldersCollapsed) {
+      expandAll()
+    } else {
+      collapseAll()
+    }
+  }
+
   return (
     <main className="flex min-h-0 flex-1 overflow-hidden px-3 py-3 sm:px-5 sm:py-4">
       <div className="flex min-h-0 flex-1 flex-col gap-3 lg:flex-row">
@@ -186,9 +226,16 @@ const CodeViewLayout = () => {
               <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#A6B0CF]">File Explorer</p>
               <p className="mt-1 text-xs text-[#8EA1C3]">Repository source tree</p>
             </div>
-            <span className="mr-3 rounded bg-[#1E293B] px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#A6B0CF]">
-              Code
-            </span>
+            <div className="mr-3 flex items-center gap-2">
+              <button
+                type="button"
+                onClick={toggleAllFolders}
+                className="rounded bg-[#1E293B] px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#A6B0CF] transition-colors duration-150 hover:bg-[#2D3E52] hover:text-[#CBD5E1] focus:outline-none focus:ring-1 focus:ring-cyan-400"
+                title={allFoldersCollapsed ? 'Expand all folders' : 'Collapse all folders'}
+              >
+                {allFoldersCollapsed ? 'Expand' : 'Collapse'}
+              </button>
+            </div>
           </div>
 
           <div className="min-h-0 flex-1 overflow-auto border-t border-[#1E293B] bg-[#0B1020] px-2 py-2">
