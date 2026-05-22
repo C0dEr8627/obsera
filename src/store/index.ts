@@ -5,7 +5,11 @@ export {
   type DependencyGraphNode,
   type DependencyGraphState,
 } from './dependencyGraphStore'
-export { useFileTree, type FileTreeNode, type FileTreeState } from './fileTreeStore'
+export {
+  useFileTree,
+  type FileTreeNode,
+  type FileTreeState,
+} from './fileTreeStore'
 export { WorkspaceViewProvider } from './WorkspaceViewProvider'
 export {
   createDependencyGraphSlice,
@@ -23,12 +27,18 @@ export {
   type FileTreeFolderNode,
   type FileTreeSlice,
 } from './slices/fileTreeSlice'
-export {
-  createSampleSlice,
-  type SampleSlice,
-} from './slices/sampleSlice'
+export { createSampleSlice, type SampleSlice } from './slices/sampleSlice'
 export {
   createWorkspaceViewSlice,
   type WorkspaceViewSlice,
 } from './slices/workspaceViewSlice'
-export { useWorkspaceView, type WorkspaceView, type WorkspaceViewState } from './workspaceViewStore'
+export {
+  useWorkspaceView,
+  type WorkspaceView,
+  type WorkspaceViewState,
+} from './workspaceViewStore'
+export {
+  createZipUploadSlice,
+  type ZipUploadSlice,
+  type ZipUploadStatus,
+} from './slices/zipUploadSlice'

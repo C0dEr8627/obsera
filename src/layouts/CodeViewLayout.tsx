@@ -1,6 +1,10 @@
 import { useState } from 'react'
 import MonacoWorkspaceContainer from '@/components/MonacoWorkspaceContainer'
-import { useFileTree, useWorkspaceView, type FileTreeNode as FileTreeItem } from '@/store'
+import {
+  useAppStore,
+  useFileTree,
+  type FileTreeNode as FileTreeItem,
+} from '@/store'
 
 const initialExpandedFolders = new Set(['src', 'src/components', 'src/layouts'])
 
@@ -15,7 +19,12 @@ export default helloWorld
 `
 
 const FolderIcon = () => (
-  <svg className="h-4 w-4 shrink-0 text-[#6EA8FF]" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+  <svg
+    className="h-4 w-4 shrink-0 text-[#6EA8FF]"
+    viewBox="0 0 16 16"
+    fill="none"
+    aria-hidden="true"
+  >
     <path
       d="M1.75 4.25A1.25 1.25 0 0 1 3 3h3.1l1.2 1.25H13A1.25 1.25 0 0 1 14.25 5.5v6A1.25 1.25 0 0 1 13 12.75H3a1.25 1.25 0 0 1-1.25-1.25V4.25Z"
       stroke="currentColor"
@@ -26,14 +35,24 @@ const FolderIcon = () => (
 )
 
 const FileIcon = () => (
-  <svg className="h-4 w-4 shrink-0 text-[#9AA8C7]" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+  <svg
+    className="h-4 w-4 shrink-0 text-[#9AA8C7]"
+    viewBox="0 0 16 16"
+    fill="none"
+    aria-hidden="true"
+  >
     <path
       d="M4.25 2.25h5L12.75 6v7.75h-8.5V2.25Z"
       stroke="currentColor"
       strokeWidth="1.25"
       strokeLinejoin="round"
     />
-    <path d="M9.25 2.5V6h3.25" stroke="currentColor" strokeWidth="1.25" strokeLinejoin="round" />
+    <path
+      d="M9.25 2.5V6h3.25"
+      stroke="currentColor"
+      strokeWidth="1.25"
+      strokeLinejoin="round"
+    />
   </svg>
 )
 
@@ -72,7 +91,11 @@ const FileTreeNode = ({
       <button
         type="button"
         className={`flex h-7 w-full items-center gap-1.5 rounded px-2 text-left text-[13px] transition-colors duration-150 hover:bg-[#17203A] focus:outline-none focus:ring-1 focus:ring-cyan-400 ${
-          isActive ? 'bg-[#1D2B4F] text-white' : isFolder ? 'text-[#B6C5E6]' : 'text-[#D7DEEC]'
+          isActive
+            ? 'bg-[#1D2B4F] text-white'
+            : isFolder
+              ? 'text-[#B6C5E6]'
+              : 'text-[#D7DEEC]'
         }`}
         style={{ paddingLeft: `${0.5 + depth * 0.875}rem` }}
         aria-expanded={isFolder ? isExpanded : undefined}
@@ -126,7 +149,7 @@ const getAllFolderIds = (items: FileTreeItem[]): string[] => {
 const CodeViewLayout = () => {
   const [expandedFolders, setExpandedFolders] = useState(initialExpandedFolders)
   const { fileTree, activeFileId, setActiveFileId } = useFileTree()
-  const { zipFileName } = useWorkspaceView()
+  const zipFileName = useAppStore((state) => state.zipFileName)
 
   const activeFilePath = activeFileId ?? 'No file selected'
   const activeFileName = activeFileId?.split('/').at(-1) ?? 'No file selected'
@@ -147,7 +170,9 @@ const CodeViewLayout = () => {
 
   // Get all folder IDs and determine if all are collapsed
   const allFolderIds = getAllFolderIds(fileTree)
-  const allFoldersCollapsed = allFolderIds.length === 0 || allFolderIds.every((id) => !expandedFolders.has(id))
+  const allFoldersCollapsed =
+    allFolderIds.length === 0 ||
+    allFolderIds.every((id) => !expandedFolders.has(id))
 
   const expandAll = () => {
     const allFolders = new Set(allFolderIds)
@@ -172,15 +197,23 @@ const CodeViewLayout = () => {
         <aside className="flex min-h-0 max-h-48 w-full shrink-0 flex-col rounded-lg border border-[#1E293B] bg-[#0F172A] shadow-[0_20px_45px_-30px_rgba(15,23,42,0.9)] lg:max-h-none lg:w-64">
           <div className="flex items-center justify-between gap-3">
             <div className="px-3 py-3">
-              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#A6B0CF]">{zipFileName || 'File Explorer'}</p>
-              <p className="mt-1 text-xs text-[#8EA1C3]">Repository source tree</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#A6B0CF]">
+                {zipFileName || 'File Explorer'}
+              </p>
+              <p className="mt-1 text-xs text-[#8EA1C3]">
+                Repository source tree
+              </p>
             </div>
             <div className="mr-3 flex items-center gap-2">
               <button
                 type="button"
                 onClick={toggleAllFolders}
                 className="rounded bg-[#1E293B] px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#A6B0CF] transition-colors duration-150 hover:bg-[#2D3E52] hover:text-[#CBD5E1] focus:outline-none focus:ring-1 focus:ring-cyan-400"
-                title={allFoldersCollapsed ? 'Expand all folders' : 'Collapse all folders'}
+                title={
+                  allFoldersCollapsed
+                    ? 'Expand all folders'
+                    : 'Collapse all folders'
+                }
               >
                 {allFoldersCollapsed ? 'Expand' : 'Collapse'}
               </button>
@@ -194,9 +227,9 @@ const CodeViewLayout = () => {
                   key={item.id}
                   item={item}
                   depth={0}
-              activeFileId={activeFileId}
-              expandedFolders={expandedFolders}
-              onSelectFile={setActiveFileId}
+                  activeFileId={activeFileId}
+                  expandedFolders={expandedFolders}
+                  onSelectFile={setActiveFileId}
                   onToggleFolder={toggleFolder}
                 />
               ))}
@@ -208,8 +241,12 @@ const CodeViewLayout = () => {
           <div className="shrink-0 border-b border-[#1E293B] px-4 py-3 sm:px-5">
             <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-sm font-semibold text-white">Editor Workspace</p>
-                <p className="text-xs text-[#94A3B8]">Read-only source inspection</p>
+                <p className="text-sm font-semibold text-white">
+                  Editor Workspace
+                </p>
+                <p className="text-xs text-[#94A3B8]">
+                  Read-only source inspection
+                </p>
               </div>
               <span className="mt-2 inline-flex items-center rounded bg-[#1E293B] px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#A6B0CF] sm:mt-0">
                 Read-only preview
