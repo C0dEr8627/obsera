@@ -1,32 +1,15 @@
 import type { StateCreator } from 'zustand'
-
-export interface FileTreeBaseNode {
-  id: string
-  name: string
-  path: string
-}
-
-export interface FileTreeFileNode extends FileTreeBaseNode {
-  type: 'file'
-  content?: string
-}
-
-export interface FileTreeFolderNode extends FileTreeBaseNode {
-  type: 'folder'
-  children: FileTreeNode[]
-}
-
-export type FileTreeNode = FileTreeFileNode | FileTreeFolderNode
+import type { FileNode } from '@/types/fileNode'
 
 export interface FileTreeSlice {
-  fileTree: FileTreeNode[]
+  fileTree: FileNode[]
   activeFileId: string | null
-  setFileTree: (fileTree: FileTreeNode[]) => void
+  setFileTree: (fileTree: FileNode[]) => void
   setActiveFileId: (fileId: string | null) => void
   resetFileTree: () => void
 }
 
-export const initialFileTree: FileTreeNode[] = [
+export const initialFileTree: FileNode[] = [
   {
     id: 'src',
     name: 'src',
@@ -143,7 +126,7 @@ export const initialFileTree: FileTreeNode[] = [
 
 export const initialActiveFileId = 'src/layouts/CodeViewLayout.tsx'
 
-const includesFileNode = (nodes: FileTreeNode[], fileId: string): boolean =>
+const includesFileNode = (nodes: FileNode[], fileId: string): boolean =>
   nodes.some((node) => {
     if (node.type === 'file') {
       return node.id === fileId
@@ -152,7 +135,7 @@ const includesFileNode = (nodes: FileTreeNode[], fileId: string): boolean =>
     return includesFileNode(node.children, fileId)
   })
 
-const findFirstFileId = (nodes: FileTreeNode[]): string | null => {
+const findFirstFileId = (nodes: FileNode[]): string | null => {
   for (const node of nodes) {
     if (node.type === 'file') {
       return node.id
@@ -195,3 +178,10 @@ export const createFileTreeSlice: StateCreator<
       activeFileId: initialActiveFileId,
     }),
 })
+
+export type {
+  FileTreeBaseNode,
+  FileTreeFileNode,
+  FileTreeFolderNode,
+  FileTreeNode,
+} from '@/types/fileNode'
