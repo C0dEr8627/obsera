@@ -1,5 +1,6 @@
 import { type ChangeEvent, type DragEvent, useRef } from 'react'
 import { useAppStore } from '@/store'
+import { readZipSummary } from './zipReader'
 
 const acceptedZipMimeTypes = new Set([
   'application/zip',
@@ -31,10 +32,15 @@ const ZipUpload = ({ compact = false }: ZipUploadProps) => {
   const inputRef = useRef<HTMLInputElement>(null)
   const zipFileName = useAppStore((state) => state.zipFileName)
   const zipFileSize = useAppStore((state) => state.zipFileSize)
+  const zipFileCount = useAppStore((state) => state.zipFileCount)
+  const zipSampleFileName = useAppStore((state) => state.zipSampleFileName)
   const zipUploadStatus = useAppStore((state) => state.zipUploadStatus)
   const zipUploadError = useAppStore((state) => state.zipUploadError)
   const acceptZipFile = useAppStore((state) => state.acceptZipFile)
   const rejectZipFile = useAppStore((state) => state.rejectZipFile)
+  const setZipUploadValidating = useAppStore(
+    (state) => state.setZipUploadValidating,
+  )
   const setZipUploadDragging = useAppStore(
     (state) => state.setZipUploadDragging,
   )
@@ -42,14 +48,16 @@ const ZipUpload = ({ compact = false }: ZipUploadProps) => {
 
   const uploadStatusText =
     zipUploadStatus === 'ready' && zipFileName
-      ? `${zipFileName}${zipFileSize ? ` - ${formatFileSize(zipFileSize)}` : ''}`
+      ? `${zipFileName}${zipFileSize ? ` - ${formatFileSize(zipFileSize)}` : ''}${zipFileCount !== null ? ` - ${zipFileCount} files readable` : ''}`
       : zipUploadStatus === 'error'
         ? zipUploadError
-        : zipUploadStatus === 'dragging'
-          ? 'Release to select ZIP file'
-          : 'No ZIP selected'
+        : zipUploadStatus === 'validating'
+          ? `Reading ${zipFileName ?? 'ZIP file'}...`
+          : zipUploadStatus === 'dragging'
+            ? 'Release to select ZIP file'
+            : 'No ZIP selected'
 
-  const handleFile = (file: File | undefined) => {
+  const handleFile = async (file: File | undefined) => {
     if (!file) {
       return
     }
@@ -59,7 +67,14 @@ const ZipUpload = ({ compact = false }: ZipUploadProps) => {
       return
     }
 
-    acceptZipFile(file)
+    setZipUploadValidating(file)
+
+    try {
+      const summary = await readZipSummary(file)
+      acceptZipFile(file, summary.fileCount, summary.sampleFileName)
+    } catch {
+      rejectZipFile('ZIP could not be read. Choose a valid ZIP archive.')
+    }
   }
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -109,6 +124,11 @@ const ZipUpload = ({ compact = false }: ZipUploadProps) => {
             >
               {uploadStatusText}
             </p>
+            {zipUploadStatus === 'ready' && zipSampleFileName && (
+              <p className="mt-0.5 truncate text-xs text-[#8EA1C3]">
+                Sample extracted: {zipSampleFileName}
+              </p>
+            )}
           </div>
 
           <button
