@@ -152,7 +152,28 @@ const includesFileNode = (nodes: FileTreeNode[], fileId: string): boolean =>
     return includesFileNode(node.children, fileId)
   })
 
-export const createFileTreeSlice: StateCreator<FileTreeSlice, [], [], FileTreeSlice> = (set) => ({
+const findFirstFileId = (nodes: FileTreeNode[]): string | null => {
+  for (const node of nodes) {
+    if (node.type === 'file') {
+      return node.id
+    }
+
+    const childFileId = findFirstFileId(node.children)
+
+    if (childFileId) {
+      return childFileId
+    }
+  }
+
+  return null
+}
+
+export const createFileTreeSlice: StateCreator<
+  FileTreeSlice,
+  [],
+  [],
+  FileTreeSlice
+> = (set) => ({
   fileTree: initialFileTree,
   activeFileId: initialActiveFileId,
   setFileTree: (fileTree) =>
@@ -161,11 +182,12 @@ export const createFileTreeSlice: StateCreator<FileTreeSlice, [], [], FileTreeSl
       activeFileId:
         state.activeFileId && includesFileNode(fileTree, state.activeFileId)
           ? state.activeFileId
-          : null,
+          : findFirstFileId(fileTree),
     })),
   setActiveFileId: (fileId) =>
     set((state) => ({
-      activeFileId: fileId && includesFileNode(state.fileTree, fileId) ? fileId : null,
+      activeFileId:
+        fileId && includesFileNode(state.fileTree, fileId) ? fileId : null,
     })),
   resetFileTree: () =>
     set({

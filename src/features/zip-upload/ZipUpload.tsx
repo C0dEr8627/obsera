@@ -38,6 +38,7 @@ const ZipUpload = ({ compact = false }: ZipUploadProps) => {
   const zipUploadError = useAppStore((state) => state.zipUploadError)
   const acceptZipFile = useAppStore((state) => state.acceptZipFile)
   const rejectZipFile = useAppStore((state) => state.rejectZipFile)
+  const setFileTree = useAppStore((state) => state.setFileTree)
   const setZipUploadValidating = useAppStore(
     (state) => state.setZipUploadValidating,
   )
@@ -71,6 +72,7 @@ const ZipUpload = ({ compact = false }: ZipUploadProps) => {
 
     try {
       const summary = await readZipSummary(file)
+      setFileTree(summary.fileTree)
       acceptZipFile(file, summary.fileCount, summary.sampleFileName)
     } catch {
       rejectZipFile('ZIP could not be read. Choose a valid ZIP archive.')
