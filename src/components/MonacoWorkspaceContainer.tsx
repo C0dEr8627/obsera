@@ -1,10 +1,16 @@
 interface MonacoWorkspaceContainerProps {
   fileName: string
   filePath: string
-  source: string
+  source: string | null
+  emptyMessage: string
 }
 
-const MonacoWorkspaceContainer = ({ fileName, filePath, source }: MonacoWorkspaceContainerProps) => (
+const MonacoWorkspaceContainer = ({
+  fileName,
+  filePath,
+  source,
+  emptyMessage,
+}: MonacoWorkspaceContainerProps) => (
   <div className="flex min-h-0 w-full flex-1 flex-col overflow-hidden rounded-lg border border-[#1E293B] bg-[#0B1020] shadow-inner shadow-black/40">
     <div className="flex h-10 shrink-0 items-center justify-between gap-4 border-b border-[#1E293B] bg-[#131D33] px-4 text-sm text-[#E6EAF5]">
       <div className="min-w-0">
@@ -21,9 +27,17 @@ const MonacoWorkspaceContainer = ({ fileName, filePath, source }: MonacoWorkspac
       data-editor-container="monaco"
       aria-label={`${fileName} editor preview`}
     >
-      <div className="absolute inset-0 overflow-auto p-4 font-mono text-sm leading-6 text-[#CBD5E1]">
-        <pre className="whitespace-pre-wrap break-words">{source}</pre>
-      </div>
+      {source !== null ? (
+        <div className="absolute inset-0 overflow-auto p-4 font-mono text-sm leading-6 text-[#CBD5E1]">
+          <pre className="whitespace-pre">{source}</pre>
+        </div>
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center px-6 text-center">
+          <p className="max-w-sm text-sm leading-6 text-[#8EA1C3]">
+            {emptyMessage}
+          </p>
+        </div>
+      )}
     </div>
   </div>
 )
