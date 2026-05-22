@@ -1,11 +1,25 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { createDependencyGraphSlice, type DependencyGraphSlice } from './slices/dependencyGraphSlice'
+import {
+  createDependencyGraphSlice,
+  type DependencyGraphSlice,
+} from './slices/dependencyGraphSlice'
 import { createFileTreeSlice, type FileTreeSlice } from './slices/fileTreeSlice'
 import { createSampleSlice, type SampleSlice } from './slices/sampleSlice'
-import { createWorkspaceViewSlice, type WorkspaceViewSlice } from './slices/workspaceViewSlice'
+import {
+  createWorkspaceViewSlice,
+  type WorkspaceViewSlice,
+} from './slices/workspaceViewSlice'
+import {
+  createZipUploadSlice,
+  type ZipUploadSlice,
+} from './slices/zipUploadSlice'
 
-export type AppStore = WorkspaceViewSlice & SampleSlice & FileTreeSlice & DependencyGraphSlice
+export type AppStore = WorkspaceViewSlice &
+  SampleSlice &
+  FileTreeSlice &
+  DependencyGraphSlice &
+  ZipUploadSlice
 
 export const useAppStore = create<AppStore>()(
   persist(
@@ -14,6 +28,7 @@ export const useAppStore = create<AppStore>()(
       ...createSampleSlice(...store),
       ...createFileTreeSlice(...store),
       ...createDependencyGraphSlice(...store),
+      ...createZipUploadSlice(...store),
     }),
     {
       name: 'obsera.app-store',
