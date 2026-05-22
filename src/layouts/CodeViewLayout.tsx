@@ -1,61 +1,6 @@
 import { useState } from 'react'
 import MonacoWorkspaceContainer from '@/components/MonacoWorkspaceContainer'
-import { useWorkspaceView } from '@/store'
-
-type FileTreeItem = {
-  id: string
-  label: string
-  type: 'folder' | 'file'
-  children?: FileTreeItem[]
-}
-
-const fileTree: FileTreeItem[] = [
-  {
-    id: 'src',
-    label: 'src',
-    type: 'folder',
-    children: [
-      {
-        id: 'src/components',
-        label: 'components',
-        type: 'folder',
-        children: [{ id: 'src/components/TopNavigation.tsx', label: 'TopNavigation.tsx', type: 'file' }],
-      },
-      {
-        id: 'src/layouts',
-        label: 'layouts',
-        type: 'folder',
-        children: [
-          { id: 'src/layouts/AppLayout.tsx', label: 'AppLayout.tsx', type: 'file' },
-          { id: 'src/layouts/CodeViewLayout.tsx', label: 'CodeViewLayout.tsx', type: 'file' },
-        ],
-      },
-      {
-        id: 'src/store',
-        label: 'store',
-        type: 'folder',
-        children: [
-          { id: 'src/store/appStore.ts', label: 'appStore.ts', type: 'file' },
-          { id: 'src/store/index.ts', label: 'index.ts', type: 'file' },
-          { id: 'src/store/workspaceViewStore.ts', label: 'workspaceViewStore.ts', type: 'file' },
-        ],
-      },
-      { id: 'src/App.tsx', label: 'App.tsx', type: 'file' },
-      { id: 'src/main.tsx', label: 'main.tsx', type: 'file' },
-    ],
-  },
-  {
-    id: 'docs',
-    label: 'docs',
-    type: 'folder',
-    children: [
-      { id: 'docs/design.md', label: 'design.md', type: 'file' },
-      { id: 'docs/requirements.md', label: 'requirements.md', type: 'file' },
-      { id: 'docs/workflow.md', label: 'workflow.md', type: 'file' },
-    ],
-  },
-  { id: 'package.json', label: 'package.json', type: 'file' },
-]
+import { useFileTree, useWorkspaceView, type FileTreeNode as FileTreeItem } from '@/store'
 
 const initialExpandedFolders = new Set(['src', 'src/components', 'src/layouts'])
 
@@ -95,7 +40,7 @@ const FileIcon = () => (
 interface FileTreeNodeProps {
   item: FileTreeItem
   depth: number
-  activeFileId: string
+  activeFileId: string | null
   expandedFolders: Set<string>
   onSelectFile: (id: string) => void
   onToggleFolder: (id: string) => void
@@ -137,10 +82,10 @@ const FileTreeNode = ({
           {isFolder ? (isExpanded ? 'v' : '>') : ''}
         </span>
         {isFolder ? <FolderIcon /> : <FileIcon />}
-        <span className="min-w-0 truncate">{item.label}</span>
+        <span className="min-w-0 truncate">{item.name}</span>
       </button>
 
-      {isFolder && isExpanded && item.children && (
+      {isFolder && isExpanded && (
         <ul className="mt-0.5 space-y-0.5">
           {item.children.map((child) => (
             <FileTreeNode
@@ -180,10 +125,11 @@ const getAllFolderIds = (items: FileTreeItem[]): string[] => {
 
 const CodeViewLayout = () => {
   const [expandedFolders, setExpandedFolders] = useState(initialExpandedFolders)
-  const [activeFileId, setActiveFileId] = useState('src/layouts/CodeViewLayout.tsx')
+  const { fileTree, activeFileId, setActiveFileId } = useFileTree()
   const { zipFileName } = useWorkspaceView()
 
-  const activeFileName = activeFileId.split('/').at(-1) ?? activeFileId
+  const activeFilePath = activeFileId ?? 'No file selected'
+  const activeFileName = activeFileId?.split('/').at(-1) ?? 'No file selected'
 
   const toggleFolder = (id: string) => {
     setExpandedFolders((currentFolders) => {
@@ -248,9 +194,9 @@ const CodeViewLayout = () => {
                   key={item.id}
                   item={item}
                   depth={0}
-                  activeFileId={activeFileId}
-                  expandedFolders={expandedFolders}
-                  onSelectFile={setActiveFileId}
+              activeFileId={activeFileId}
+              expandedFolders={expandedFolders}
+              onSelectFile={setActiveFileId}
                   onToggleFolder={toggleFolder}
                 />
               ))}
@@ -274,7 +220,7 @@ const CodeViewLayout = () => {
           <div className="flex min-h-0 flex-1 overflow-hidden p-3 sm:p-5">
             <MonacoWorkspaceContainer
               fileName={activeFileName}
-              filePath={activeFileId}
+              filePath={activeFilePath}
               source={editorPreviewSource}
             />
           </div>
