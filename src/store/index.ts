@@ -1,6 +1,19 @@
 export { useAppStore, type AppStore } from './appStore'
+export {
+  useDependencyGraph,
+  type DependencyGraphEdge,
+  type DependencyGraphNode,
+  type DependencyGraphState,
+} from './dependencyGraphStore'
 export { useFileTree, type FileTreeNode, type FileTreeState } from './fileTreeStore'
 export { WorkspaceViewProvider } from './WorkspaceViewProvider'
+export {
+  createDependencyGraphSlice,
+  initialGraphEdges,
+  initialGraphNodes,
+  type DependencyGraphPosition,
+  type DependencyGraphSlice,
+} from './slices/dependencyGraphSlice'
 export {
   createFileTreeSlice,
   initialActiveFileId,
