@@ -1,12 +1,12 @@
 import JSZip from 'jszip'
-import type { FileTreeNode } from '@/store'
+import type { FileNode } from '@/types/fileNode'
 
 export interface ZipReadSummary {
   fileCount: number
   ignoredFileCount: number
   sampleFileName: string | null
   sampleFileContent: string | null
-  fileTree: FileTreeNode[]
+  fileTree: FileNode[]
 }
 
 const ignoredDirectoryNames = new Set([
@@ -203,7 +203,7 @@ const isSupportedFilePath = (path: string) => {
 
 const isSupportedFolderPath = (path: string) => !isIgnoredPath(path)
 
-const sortFileTree = (nodes: FileTreeNode[]): FileTreeNode[] =>
+const sortFileTree = (nodes: FileNode[]): FileNode[] =>
   [...nodes]
     .map((node) =>
       node.type === 'folder'
@@ -221,8 +221,8 @@ const sortFileTree = (nodes: FileTreeNode[]): FileTreeNode[] =>
       return firstNode.name.localeCompare(secondNode.name)
     })
 
-const removeEmptyFolders = (nodes: FileTreeNode[]): FileTreeNode[] =>
-  nodes.reduce<FileTreeNode[]>((filteredNodes, node) => {
+const removeEmptyFolders = (nodes: FileNode[]): FileNode[] =>
+  nodes.reduce<FileNode[]>((filteredNodes, node) => {
     if (node.type === 'file') {
       filteredNodes.push(node)
       return filteredNodes
@@ -243,7 +243,7 @@ const removeEmptyFolders = (nodes: FileTreeNode[]): FileTreeNode[] =>
   }, [])
 
 const findOrCreateFolder = (
-  siblings: FileTreeNode[],
+  siblings: FileNode[],
   name: string,
   path: string,
 ) => {
@@ -260,14 +260,15 @@ const findOrCreateFolder = (
     name,
     path,
     type: 'folder',
+    metadata: {},
     children: [],
-  } satisfies FileTreeNode
+  } satisfies FileNode
 
   siblings.push(folder)
   return folder
 }
 
-const addFileToTree = (tree: FileTreeNode[], path: string, content: string) => {
+const addFileToTree = (tree: FileNode[], path: string, content: string) => {
   const pathParts = path.split('/').filter(Boolean)
 
   if (pathParts.length === 0) {
@@ -297,8 +298,12 @@ const addFileToTree = (tree: FileTreeNode[], path: string, content: string) => {
     name: fileName,
     path,
     type: 'file',
+    metadata: {
+      extension: getFileExtension(fileName),
+      isText: true,
+    },
     content,
-  } satisfies FileTreeNode
+  } satisfies FileNode
 
   if (existingFileIndex >= 0) {
     siblings[existingFileIndex] = fileNode
@@ -308,7 +313,7 @@ const addFileToTree = (tree: FileTreeNode[], path: string, content: string) => {
   siblings.push(fileNode)
 }
 
-const addFolderToTree = (tree: FileTreeNode[], path: string) => {
+const addFolderToTree = (tree: FileNode[], path: string) => {
   const pathParts = path.split('/').filter(Boolean)
 
   if (pathParts.length === 0) {
@@ -335,7 +340,7 @@ export const readZipSummary = async (file: File): Promise<ZipReadSummary> => {
     isSupportedFilePath(normalizeZipPath(entry.name)),
   )
   const sampleFile = files[0] ?? null
-  const fileTree: FileTreeNode[] = []
+  const fileTree: FileNode[] = []
 
   for (const entry of folders) {
     addFolderToTree(fileTree, normalizeZipPath(entry.name))

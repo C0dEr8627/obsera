@@ -10,6 +10,14 @@ export {
   type FileTreeNode,
   type FileTreeState,
 } from './fileTreeStore'
+export type {
+  FileNode,
+  FileNodeBase,
+  FileNodeFile,
+  FileNodeFolder,
+  FileNodeMetadata,
+  FileNodeType,
+} from '@/types/fileNode'
 export { WorkspaceViewProvider } from './WorkspaceViewProvider'
 export {
   createDependencyGraphSlice,
