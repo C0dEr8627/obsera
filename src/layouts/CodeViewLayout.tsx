@@ -35,8 +35,9 @@ const fileTree: FileTreeItem[] = [
         label: 'store',
         type: 'folder',
         children: [
+          { id: 'src/store/appStore.ts', label: 'appStore.ts', type: 'file' },
           { id: 'src/store/index.ts', label: 'index.ts', type: 'file' },
-          { id: 'src/store/workspaceViewStore.tsx', label: 'workspaceViewStore.tsx', type: 'file' },
+          { id: 'src/store/workspaceViewStore.ts', label: 'workspaceViewStore.ts', type: 'file' },
         ],
       },
       { id: 'src/App.tsx', label: 'App.tsx', type: 'file' },
