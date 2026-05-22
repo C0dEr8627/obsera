@@ -33,6 +33,7 @@ const ZipUpload = ({ compact = false }: ZipUploadProps) => {
   const zipFileName = useAppStore((state) => state.zipFileName)
   const zipFileSize = useAppStore((state) => state.zipFileSize)
   const zipFileCount = useAppStore((state) => state.zipFileCount)
+  const zipIgnoredFileCount = useAppStore((state) => state.zipIgnoredFileCount)
   const zipSampleFileName = useAppStore((state) => state.zipSampleFileName)
   const zipUploadStatus = useAppStore((state) => state.zipUploadStatus)
   const zipUploadError = useAppStore((state) => state.zipUploadError)
@@ -49,7 +50,7 @@ const ZipUpload = ({ compact = false }: ZipUploadProps) => {
 
   const uploadStatusText =
     zipUploadStatus === 'ready' && zipFileName
-      ? `${zipFileName}${zipFileSize ? ` - ${formatFileSize(zipFileSize)}` : ''}${zipFileCount !== null ? ` - ${zipFileCount} files readable` : ''}`
+      ? `${zipFileName}${zipFileSize ? ` - ${formatFileSize(zipFileSize)}` : ''}${zipFileCount !== null ? ` - ${zipFileCount} files loaded` : ''}${zipIgnoredFileCount ? ` - ${zipIgnoredFileCount} ignored` : ''}`
       : zipUploadStatus === 'error'
         ? zipUploadError
         : zipUploadStatus === 'validating'
@@ -73,7 +74,12 @@ const ZipUpload = ({ compact = false }: ZipUploadProps) => {
     try {
       const summary = await readZipSummary(file)
       setFileTree(summary.fileTree)
-      acceptZipFile(file, summary.fileCount, summary.sampleFileName)
+      acceptZipFile(
+        file,
+        summary.fileCount,
+        summary.ignoredFileCount,
+        summary.sampleFileName,
+      )
     } catch {
       rejectZipFile('ZIP could not be read. Choose a valid ZIP archive.')
     }

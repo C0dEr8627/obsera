@@ -11,6 +11,7 @@ export interface ZipUploadSlice {
   zipFileName: string | null
   zipFileSize: number | null
   zipFileCount: number | null
+  zipIgnoredFileCount: number | null
   zipSampleFileName: string | null
   zipUploadStatus: ZipUploadStatus
   zipUploadError: string | null
@@ -20,6 +21,7 @@ export interface ZipUploadSlice {
   acceptZipFile: (
     file: File,
     fileCount: number,
+    ignoredFileCount: number,
     sampleFileName: string | null,
   ) => void
   rejectZipFile: (message: string) => void
@@ -35,6 +37,7 @@ export const createZipUploadSlice: StateCreator<
   zipFileName: null,
   zipFileSize: null,
   zipFileCount: null,
+  zipIgnoredFileCount: null,
   zipSampleFileName: null,
   zipUploadStatus: 'idle',
   zipUploadError: null,
@@ -52,15 +55,17 @@ export const createZipUploadSlice: StateCreator<
       zipFileName: file.name,
       zipFileSize: file.size,
       zipFileCount: null,
+      zipIgnoredFileCount: null,
       zipSampleFileName: null,
       zipUploadStatus: 'validating',
       zipUploadError: null,
     }),
-  acceptZipFile: (file, fileCount, sampleFileName) =>
+  acceptZipFile: (file, fileCount, ignoredFileCount, sampleFileName) =>
     set({
       zipFileName: file.name,
       zipFileSize: file.size,
       zipFileCount: fileCount,
+      zipIgnoredFileCount: ignoredFileCount,
       zipSampleFileName: sampleFileName,
       zipUploadStatus: 'ready',
       zipUploadError: null,
@@ -70,6 +75,7 @@ export const createZipUploadSlice: StateCreator<
       zipFileName: null,
       zipFileSize: null,
       zipFileCount: null,
+      zipIgnoredFileCount: null,
       zipSampleFileName: null,
       zipUploadStatus: 'error',
       zipUploadError: message,
@@ -79,6 +85,7 @@ export const createZipUploadSlice: StateCreator<
       zipFileName: null,
       zipFileSize: null,
       zipFileCount: null,
+      zipIgnoredFileCount: null,
       zipSampleFileName: null,
       zipUploadStatus: 'idle',
       zipUploadError: null,
