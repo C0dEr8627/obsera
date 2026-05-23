@@ -54,3 +54,7 @@ export {
   createTechStackSlice,
   type TechStackSlice,
 } from '@/store/slices/techStackSlice'
+export {
+  createProcessingSlice,
+  type ProcessingSlice,
+} from '@/features/processing/store/processingStore'
