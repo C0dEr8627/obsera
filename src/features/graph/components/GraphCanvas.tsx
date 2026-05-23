@@ -1,6 +1,12 @@
 import { useMemo } from 'react'
-import ReactFlow, { Background, ReactFlowProvider, type NodeTypes } from 'reactflow'
+import ReactFlow, {
+  Background,
+  ReactFlowProvider,
+  type EdgeTypes,
+  type NodeTypes,
+} from 'reactflow'
 import 'reactflow/dist/style.css'
+import GraphEdge from './GraphEdge'
 import GraphNode from './GraphNode'
 import { createSampleGraph, mapDependencyGraphToReactFlow } from '../utils/graphUtils'
 import type { DependencyGraphEdge, DependencyGraphNode } from '@/store'
@@ -14,6 +20,10 @@ interface GraphCanvasProps {
 
 const nodeTypes: NodeTypes = {
   graphNode: GraphNode,
+}
+
+const edgeTypes: EdgeTypes = {
+  dependencyEdge: GraphEdge,
 }
 
 const GraphCanvas = ({ graphNodes = [], graphEdges = [] }: GraphCanvasProps) => {
@@ -32,6 +42,7 @@ const GraphCanvas = ({ graphNodes = [], graphEdges = [] }: GraphCanvasProps) => 
           nodes={graphData.nodes}
           edges={graphData.edges}
           nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes}
           fitView
           panOnScroll={false}
           zoomOnScroll={false}
@@ -42,6 +53,11 @@ const GraphCanvas = ({ graphNodes = [], graphEdges = [] }: GraphCanvasProps) => 
           style={{ backgroundColor: '#070E1C' }}
           onInit={(instance) => instance.fitView({ padding: 0.14 })}
           attributionPosition="bottom-left"
+          defaultEdgeOptions={{
+            animated: true,
+            type: 'dependencyEdge',
+            style: { stroke: '#22d3ee', strokeWidth: 2 },
+          }}
         >
           <Background gap={24} size={1} color="rgba(148, 163, 184, 0.12)" />
         </ReactFlow>

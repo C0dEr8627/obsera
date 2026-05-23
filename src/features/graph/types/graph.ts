@@ -8,5 +8,10 @@ export interface GraphNodeData {
   metadata?: Record<string, unknown>
 }
 
+export interface GraphEdgeData {
+  label?: string
+  metadata?: Record<string, unknown>
+}
+
 export type GraphFlowNode = Node<GraphNodeData>
-export type GraphFlowEdge = Edge
+export type GraphFlowEdge = Edge<GraphEdgeData>
