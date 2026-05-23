@@ -42,23 +42,39 @@ const sampleGraphEdges: GraphFlowEdge[] = [
     id: 'e-App-Home',
     source: 'App.tsx',
     target: 'Home.tsx',
-    type: 'smoothstep',
+    type: 'dependencyEdge',
     animated: true,
+    data: { label: 'imports Home', metadata: { relation: 'import' } },
     style: { stroke: '#22d3ee', strokeWidth: 2 },
   },
   {
     id: 'e-Home-ProductCard',
     source: 'Home.tsx',
     target: 'ProductCard.tsx',
-    type: 'smoothstep',
+    type: 'dependencyEdge',
     animated: true,
+    data: { label: 'imports ProductCard', metadata: { relation: 'import' } },
     style: { stroke: '#22d3ee', strokeWidth: 2 },
   },
 ]
 
+const dedupeEdges = (edges: GraphFlowEdge[]): GraphFlowEdge[] => {
+  const seen = new Set<string>()
+
+  return edges.filter((edge) => {
+    const key = `${edge.source}->${edge.target}`
+    if (seen.has(key)) {
+      return false
+    }
+
+    seen.add(key)
+    return true
+  })
+}
+
 export const createSampleGraph = () => ({
   nodes: sampleGraphNodes,
-  edges: sampleGraphEdges,
+  edges: dedupeEdges(sampleGraphEdges),
 })
 
 export const mapDependencyGraphToReactFlow = (
@@ -83,16 +99,19 @@ export const mapDependencyGraphToReactFlow = (
     position: node.position ?? { x: index * 260, y: (index % 2) * 140 },
   }))
 
-  const flowEdges: GraphFlowEdge[] = edges
-    .filter((edge) => validIds.includes(edge.source) && validIds.includes(edge.target))
-    .map((edge) => ({
-      id: edge.id,
-      source: edge.source,
-      target: edge.target,
-      type: 'smoothstep',
-      animated: true,
-      style: { stroke: '#22d3ee', strokeWidth: 2 },
-    }))
+  const flowEdges: GraphFlowEdge[] = dedupeEdges(
+    edges
+      .filter((edge) => validIds.includes(edge.source) && validIds.includes(edge.target))
+      .map((edge) => ({
+        id: edge.id,
+        source: edge.source,
+        target: edge.target,
+        type: 'dependencyEdge',
+        animated: true,
+        data: { label: 'import relationship', metadata: { source: edge.source, target: edge.target } },
+        style: { stroke: '#22d3ee', strokeWidth: 2 },
+      })),
+  )
 
   return {
     nodes: flowNodes,

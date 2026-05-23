@@ -1,4 +1,5 @@
 import type { FC } from 'react'
+import { Handle, Position } from 'reactflow'
 import type { NodeProps } from 'reactflow'
 import type { GraphNodeData } from '../types'
 
@@ -13,6 +14,7 @@ const GraphNode: FC<NodeProps<GraphNodeData>> = ({ data, selected }) => {
           : 'border-[#334155] hover:border-cyan-400/60'
       }`}
     >
+      <Handle type="target" position={Position.Left} id="left-target" className="!bg-transparent" />
       <div className="flex items-center justify-between gap-3 text-left">
         <div className="min-w-0">
           <div className="truncate text-sm font-semibold text-cyan-100">{data.label}</div>
@@ -32,6 +34,7 @@ const GraphNode: FC<NodeProps<GraphNodeData>> = ({ data, selected }) => {
           ))}
         </div>
       ) : null}
+      <Handle type="source" position={Position.Right} id="right-source" className="!bg-transparent" />
     </div>
   )
 }
