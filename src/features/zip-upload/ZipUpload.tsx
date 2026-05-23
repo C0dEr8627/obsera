@@ -45,6 +45,8 @@ const ZipUpload = ({ compact = false }: ZipUploadProps) => {
   const setZipUploadValidating = useAppStore(
     (state) => state.setZipUploadValidating,
   )
+  const setProcessingStage = useAppStore((state) => state.setStage)
+  const setProcessingError = useAppStore((state) => state.setError)
   const setZipUploadDragging = useAppStore(
     (state) => state.setZipUploadDragging,
   )
@@ -72,6 +74,9 @@ const ZipUpload = ({ compact = false }: ZipUploadProps) => {
     }
 
     setZipUploadValidating(file)
+    try {
+      setProcessingStage('uploading', { percent: 2, message: 'Uploading ZIP' })
+    } catch {}
 
     try {
       const summary = await readZipSummary(file)
@@ -84,8 +89,14 @@ const ZipUpload = ({ compact = false }: ZipUploadProps) => {
         summary.ignoredFileCount,
         summary.sampleFileName,
       )
+      try {
+        setProcessingStage('completed', { percent: 100, message: 'Ready' })
+      } catch {}
     } catch {
       setZipTechStack([])
+      try {
+        setProcessingError('ZIP could not be read. Choose a valid ZIP archive.')
+      } catch {}
       rejectZipFile('ZIP could not be read. Choose a valid ZIP archive.')
     }
   }

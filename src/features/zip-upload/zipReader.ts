@@ -10,6 +10,7 @@ import {
 } from '@/utils/dependencyGraphGenerator'
 import { detectTechStack } from '@/features/tech-stack/utils/detectTechStack'
 import type { TechStackItem } from '@/features/tech-stack/types'
+import { useAppStore } from '@/store'
 
 export interface ZipReadSummary {
   fileCount: number
@@ -216,6 +217,11 @@ const isSupportedFilePath = (path: string) => {
 const isSupportedFolderPath = (path: string) => !isIgnoredPath(path)
 
 export const readZipSummary = async (file: File): Promise<ZipReadSummary> => {
+  const setStage = useAppStore.getState().setStage
+  try {
+    setStage('extracting', { percent: 5, message: 'Opening archive' })
+  } catch {}
+
   const archive = await JSZip.loadAsync(await file.arrayBuffer())
   const folders = Object.values(archive.files).filter((entry) => {
     const path = normalizeZipPath(entry.name)
@@ -243,11 +249,32 @@ export const readZipSummary = async (file: File): Promise<ZipReadSummary> => {
     })
   }
 
+  try {
+    setStage('parsing', { percent: 30, message: 'Parsing files' })
+  } catch {}
+
   const dependencyGraph = buildDependencyGraph(
     extractedFiles.map((file) => ({ path: file.path, content: file.content ?? '' })),
   )
 
-  const techStack = detectTechStack(extractedFiles)
+  try {
+    setStage('generatingGraph', { percent: 65, message: 'Generating dependency graph' })
+  } catch {}
+
+  let techStack: TechStackItem[] = []
+  try {
+    setStage('detectingTechStack', { percent: 80, message: 'Detecting tech stack' })
+    techStack = detectTechStack(extractedFiles)
+  } catch (e) {
+    try {
+      useAppStore.getState().setError(String(e ?? 'Tech stack detection failed'))
+      setStage('error')
+    } catch {}
+  }
+
+  try {
+    setStage('completed', { percent: 100, message: 'Analysis complete' })
+  } catch {}
 
   return {
     fileCount: files.length,
