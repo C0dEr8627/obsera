@@ -14,12 +14,17 @@ import {
   createZipUploadSlice,
   type ZipUploadSlice,
 } from '@/store/slices/zipUploadSlice'
+import {
+  createTechStackSlice,
+  type TechStackSlice,
+} from '@/store/slices/techStackSlice'
 
 export type AppStore = WorkspaceViewSlice &
   SampleSlice &
   FileTreeSlice &
   DependencyGraphSlice &
-  ZipUploadSlice
+  ZipUploadSlice &
+  TechStackSlice
 
 export const useAppStore = create<AppStore>()(
   persist(
@@ -29,6 +34,7 @@ export const useAppStore = create<AppStore>()(
       ...createFileTreeSlice(...store),
       ...createDependencyGraphSlice(...store),
       ...createZipUploadSlice(...store),
+      ...createTechStackSlice(...store),
     }),
     {
       name: 'obsera.app-store',
