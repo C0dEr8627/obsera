@@ -1,5 +1,6 @@
 import { useDependencyGraph } from '@/store'
 import GraphCanvas from '@/features/graph/components/GraphCanvas'
+import InspectorPanel from '@/features/inspector/components/InspectorPanel'
 
 const VisualViewLayout = () => {
   const { graphNodes, graphEdges, selectedGraphNodeId } = useDependencyGraph()
@@ -8,9 +9,10 @@ const VisualViewLayout = () => {
   const edgeCount = graphEdges.length > 0 ? graphEdges.length : 2
 
   return (
-    <main className="flex min-h-0 flex-1 overflow-hidden px-3 py-3 sm:px-5 sm:py-4">
-      <section className="flex min-h-0 w-full flex-1 flex-col overflow-hidden rounded-lg border border-[#1E293B] bg-[#0B1020] shadow-[0_24px_50px_-30px_rgba(0,0,0,0.7)]">
-        <div className="shrink-0 border-b border-[#1E293B] bg-[#111827] px-4 py-3 sm:px-5">
+    <main className="flex min-h-0 flex-1 overflow-auto px-3 py-3 sm:px-5 sm:py-4">
+      <div className="flex min-h-0 flex-1 flex-col gap-3 lg:flex-row">
+        <section className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border border-[#1E293B] bg-[#0B1020] shadow-[0_24px_50px_-30px_rgba(0,0,0,0.7)]">
+          <div className="shrink-0 border-b border-[#1E293B] bg-[#111827] px-4 py-3 sm:px-5">
           <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
               <p className="text-sm font-semibold text-white">Visual Workspace</p>
@@ -50,6 +52,11 @@ const VisualViewLayout = () => {
           </div>
         </div>
       </section>
+
+        <div className="min-h-0 w-full max-w-sm shrink-0 lg:w-[360px]">
+          <InspectorPanel />
+        </div>
+      </div>
     </main>
   )
 }

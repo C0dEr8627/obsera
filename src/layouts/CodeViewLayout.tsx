@@ -47,7 +47,7 @@ const CodeViewLayout = () => {
     : 'Select a source file from the file tree to preview its contents.'
 
   return (
-    <main className="flex min-h-0 flex-1 overflow-hidden px-3 py-3 sm:px-5 sm:py-4">
+    <main className="flex min-h-0 flex-1 overflow-auto px-3 py-3 sm:px-5 sm:py-4">
       <div className="flex min-h-0 flex-1 flex-col gap-3 lg:flex-row">
         <FileTreeSidebar
           title={zipFileName || 'File Explorer'}

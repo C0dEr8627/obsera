@@ -3,12 +3,14 @@ import ReactFlow, {
   Background,
   ReactFlowProvider,
   type EdgeTypes,
+  type NodeMouseHandler,
   type NodeTypes,
 } from 'reactflow'
 import 'reactflow/dist/style.css'
 import GraphEdge from './GraphEdge'
 import GraphNode from './GraphNode'
 import { createSampleGraph, mapDependencyGraphToReactFlow } from '../utils/graphUtils'
+import { useDependencyGraph } from '@/store'
 import type { DependencyGraphEdge, DependencyGraphNode } from '@/store'
 
 const sampleGraph = createSampleGraph()
@@ -35,6 +37,7 @@ const GraphCanvas = ({ graphNodes = [], graphEdges = [] }: GraphCanvasProps) => 
     return mapDependencyGraphToReactFlow(graphNodes, graphEdges)
   }, [graphNodes, graphEdges])
 
+  const { setSelectedGraphNodeId } = useDependencyGraph()
   const rfInstance = useRef<any | null>(null)
 
   const onInit = useCallback((instance: any) => {
@@ -45,6 +48,16 @@ const GraphCanvas = ({ graphNodes = [], graphEdges = [] }: GraphCanvasProps) => 
   const handleZoomIn = useCallback(() => rfInstance.current?.zoomIn?.(), [])
   const handleZoomOut = useCallback(() => rfInstance.current?.zoomOut?.(), [])
   const handleFitView = useCallback(() => rfInstance.current?.fitView?.({ padding: 0.14 }), [])
+  const handleNodeClick = useCallback<NodeMouseHandler>(
+    (_event, node) => {
+      setSelectedGraphNodeId(node.id)
+    },
+    [setSelectedGraphNodeId],
+  )
+
+  const handlePaneClick = useCallback(() => {
+    setSelectedGraphNodeId(null)
+  }, [setSelectedGraphNodeId])
 
   return (
     <ReactFlowProvider>
@@ -63,6 +76,8 @@ const GraphCanvas = ({ graphNodes = [], graphEdges = [] }: GraphCanvasProps) => 
           maxZoom={2.5}
           style={{ backgroundColor: '#070E1C' }}
           onInit={onInit}
+          onNodeClick={handleNodeClick}
+          onPaneClick={handlePaneClick}
           attributionPosition="bottom-left"
           defaultEdgeOptions={{
             animated: true,
