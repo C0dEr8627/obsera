@@ -1,8 +1,8 @@
 import TopNavigation from '@/components/TopNavigation'
 import ZipUpload from '@/features/zip-upload/ZipUpload'
 import { useAppStore, useWorkspaceView } from '@/store'
-import CodeViewLayout from './CodeViewLayout'
-import VisualViewLayout from './VisualViewLayout'
+import CodeViewLayout from '@/layouts/CodeViewLayout'
+import VisualViewLayout from '@/layouts/VisualViewLayout'
 
 const AppLayout = () => {
   const { activeView, setActiveView } = useWorkspaceView()

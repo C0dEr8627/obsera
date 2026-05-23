@@ -3,17 +3,17 @@ import { persist } from 'zustand/middleware'
 import {
   createDependencyGraphSlice,
   type DependencyGraphSlice,
-} from './slices/dependencyGraphSlice'
-import { createFileTreeSlice, type FileTreeSlice } from './slices/fileTreeSlice'
-import { createSampleSlice, type SampleSlice } from './slices/sampleSlice'
+} from '@/store/slices/dependencyGraphSlice'
+import { createFileTreeSlice, type FileTreeSlice } from '@/store/slices/fileTreeSlice'
+import { createSampleSlice, type SampleSlice } from '@/store/slices/sampleSlice'
 import {
   createWorkspaceViewSlice,
   type WorkspaceViewSlice,
-} from './slices/workspaceViewSlice'
+} from '@/store/slices/workspaceViewSlice'
 import {
   createZipUploadSlice,
   type ZipUploadSlice,
-} from './slices/zipUploadSlice'
+} from '@/store/slices/zipUploadSlice'
 
 export type AppStore = WorkspaceViewSlice &
   SampleSlice &

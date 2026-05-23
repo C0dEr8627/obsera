@@ -1,9 +1,9 @@
-import { useAppStore } from './appStore'
+import { useAppStore } from '@/store/appStore'
 import type {
   DependencyGraphEdge,
   DependencyGraphNode,
   DependencyGraphSlice as DependencyGraphState,
-} from './slices/dependencyGraphSlice'
+} from '@/store/slices/dependencyGraphSlice'
 
 export const useDependencyGraph = (): DependencyGraphState =>
   ({

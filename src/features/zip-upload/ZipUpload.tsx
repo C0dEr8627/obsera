@@ -1,6 +1,6 @@
 import { type ChangeEvent, type DragEvent, useRef } from 'react'
 import { useAppStore } from '@/store'
-import { readZipSummary } from './zipReader'
+import { readZipSummary } from '@/features/zip-upload/zipReader'
 
 const acceptedZipMimeTypes = new Set([
   'application/zip',
