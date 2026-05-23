@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { useDependencyGraph, useFileTree } from '@/store'
 import type { FileTreeNode } from '@/types/fileNode'
 import type { InspectorModuleInfo } from '../types'
+import { generateModuleSummary } from '@/features/module-summary/utils/generateModuleSummary'
 import InspectorSection from './InspectorSection'
 
 const findFileNodeById = (
@@ -56,6 +57,16 @@ const buildInspectorModule = (
   const importedModules = outgoing.map((edge) => edge.target)
   const importedByModules = incoming.map((edge) => edge.source)
 
+  const summary = generateModuleSummary({
+    fileName: moduleNode.label,
+    filePath: moduleNode.filePath,
+    importCount: outgoing.length,
+    exportCount: incoming.length,
+    importedModules,
+    importedByModules,
+    sourceCode: activeFile?.type === 'file' ? activeFile.content ?? null : null,
+  })
+
   return {
     id: moduleNode.id,
     name: moduleNode.label,
@@ -65,10 +76,7 @@ const buildInspectorModule = (
     exportCount: incoming.length,
     importedModules,
     importedByModules,
-    summary:
-      selectedGraphNode || activeFile?.type === 'file'
-        ? 'This module is ready for inspection. Future AI summaries and dependency analytics will appear here.'
-        : 'No module selected. Choose a file or graph node to inspect details.',
+    summary,
     source: selectedGraphNode ? 'graph' : 'file',
   }
 }
