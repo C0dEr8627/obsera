@@ -12,6 +12,18 @@ export interface DependencyGraphData {
 const normalizeFilePath = (path: string): string =>
   path.replace(/\\/g, '/').replace(/^\/+|\/+$/g, '')
 
+const stripLocalAliasPrefix = (source: string): string => {
+  if (source.startsWith('@/')) {
+    return source.slice(2)
+  }
+
+  if (source.startsWith('/')) {
+    return source.slice(1)
+  }
+
+  return source
+}
+
 const supportedImportExtensions = [
   '.ts',
   '.tsx',
@@ -28,7 +40,9 @@ const resolveImportTarget = (
   resolvedPath: string,
   filePathSet: Set<string>,
 ): string | null => {
-  const normalizedResolvedPath = normalizeFilePath(resolvedPath)
+  const normalizedResolvedPath = normalizeFilePath(
+    stripLocalAliasPrefix(resolvedPath),
+  )
 
   if (filePathSet.has(normalizedResolvedPath)) {
     return normalizedResolvedPath
@@ -76,11 +90,13 @@ export const buildDependencyGraph = (
     const scanResult = scanImports(file.path, file.content)
 
     for (const reference of scanResult.references) {
-      if (!reference.resolvedPath) {
+      const importSource = reference.resolvedPath ?? reference.normalizedSource
+
+      if (!importSource) {
         continue
       }
 
-      const targetPath = resolveImportTarget(reference.resolvedPath, filePathSet)
+      const targetPath = resolveImportTarget(importSource, filePathSet)
 
       if (!targetPath || targetPath === file.path) {
         continue
