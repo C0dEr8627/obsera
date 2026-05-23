@@ -14,4 +14,16 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+
+  optimizeDeps: {
+    include: [
+      'reactflow',
+      '@reactflow/core',
+      '@reactflow/background',
+      '@reactflow/controls',
+      '@reactflow/minimap',
+      '@reactflow/node-toolbar',
+      '@reactflow/node-resizer',
+    ],
+  },
 })
