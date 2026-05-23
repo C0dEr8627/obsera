@@ -1,8 +1,8 @@
-import { useAppStore } from './appStore'
+import { useAppStore } from '@/store/appStore'
 import type {
   WorkspaceView,
   WorkspaceViewSlice as WorkspaceViewState,
-} from './slices/workspaceViewSlice'
+} from '@/store/slices/workspaceViewSlice'
 
 export const useWorkspaceView = (): WorkspaceViewState => ({
   activeView: useAppStore((state) => state.activeView),

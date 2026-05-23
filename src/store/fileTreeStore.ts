@@ -1,6 +1,6 @@
-import { useAppStore } from './appStore'
+import { useAppStore } from '@/store/appStore'
 import type { FileTreeNode } from '@/types/fileNode'
-import type { FileTreeSlice as FileTreeState } from './slices/fileTreeSlice'
+import type { FileTreeSlice as FileTreeState } from '@/store/slices/fileTreeSlice'
 
 export const useFileTree = (): FileTreeState => ({
   fileTree: useAppStore((state) => state.fileTree),
