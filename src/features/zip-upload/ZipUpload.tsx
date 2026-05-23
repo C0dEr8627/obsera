@@ -41,6 +41,7 @@ const ZipUpload = ({ compact = false }: ZipUploadProps) => {
   const rejectZipFile = useAppStore((state) => state.rejectZipFile)
   const setFileTree = useAppStore((state) => state.setFileTree)
   const setDependencyGraph = useAppStore((state) => state.setDependencyGraph)
+  const setZipTechStack = useAppStore((state) => state.setZipTechStack)
   const setZipUploadValidating = useAppStore(
     (state) => state.setZipUploadValidating,
   )
@@ -76,6 +77,7 @@ const ZipUpload = ({ compact = false }: ZipUploadProps) => {
       const summary = await readZipSummary(file)
       setFileTree(summary.fileTree)
       setDependencyGraph(summary.dependencyGraph.nodes, summary.dependencyGraph.edges)
+      setZipTechStack(summary.techStack)
       acceptZipFile(
         file,
         summary.fileCount,
@@ -83,6 +85,7 @@ const ZipUpload = ({ compact = false }: ZipUploadProps) => {
         summary.sampleFileName,
       )
     } catch {
+      setZipTechStack([])
       rejectZipFile('ZIP could not be read. Choose a valid ZIP archive.')
     }
   }

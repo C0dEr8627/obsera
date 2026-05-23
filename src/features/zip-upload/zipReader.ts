@@ -8,6 +8,8 @@ import {
   buildDependencyGraph,
   type DependencyGraphData,
 } from '@/utils/dependencyGraphGenerator'
+import { detectTechStack } from '@/features/tech-stack/utils/detectTechStack'
+import type { TechStackItem } from '@/features/tech-stack/types'
 
 export interface ZipReadSummary {
   fileCount: number
@@ -16,6 +18,7 @@ export interface ZipReadSummary {
   sampleFileContent: string | null
   fileTree: FileNode[]
   dependencyGraph: DependencyGraphData
+  techStack: TechStackItem[]
 }
 
 const ignoredDirectoryNames = new Set([
@@ -244,6 +247,8 @@ export const readZipSummary = async (file: File): Promise<ZipReadSummary> => {
     extractedFiles.map((file) => ({ path: file.path, content: file.content ?? '' })),
   )
 
+  const techStack = detectTechStack(extractedFiles)
+
   return {
     fileCount: files.length,
     ignoredFileCount: allFiles.length - files.length,
@@ -257,5 +262,6 @@ export const readZipSummary = async (file: File): Promise<ZipReadSummary> => {
       pruneEmptyFolders: true,
     }),
     dependencyGraph,
+    techStack,
   }
 }

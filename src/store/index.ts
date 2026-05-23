@@ -50,3 +50,7 @@ export {
   type ZipUploadSlice,
   type ZipUploadStatus,
 } from '@/store/slices/zipUploadSlice'
+export {
+  createTechStackSlice,
+  type TechStackSlice,
+} from '@/store/slices/techStackSlice'
