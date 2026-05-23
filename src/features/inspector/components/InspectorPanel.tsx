@@ -1,9 +1,10 @@
 import { useMemo } from 'react'
-import { useDependencyGraph, useFileTree } from '@/store'
+import { useDependencyGraph, useFileTree, useAppStore } from '@/store'
 import type { FileTreeNode } from '@/types/fileNode'
 import type { InspectorModuleInfo } from '../types'
 import { generateModuleSummary } from '@/features/module-summary/utils/generateModuleSummary'
 import InspectorSection from './InspectorSection'
+import TechStackPanel from '@/features/tech-stack/components/TechStackPanel'
 
 const findFileNodeById = (
   nodes: FileTreeNode[],
@@ -108,6 +109,8 @@ const InspectorPanel = () => {
     [selectedGraphNode, activeGraphNode, activeFile, graphEdges],
   )
 
+  const zipTechStack = useAppStore((state) => state.zipTechStack)
+
   return (
     <aside className="flex min-h-0 w-full flex-col overflow-hidden rounded-3xl border border-[#1E293B] bg-[#0B1020] shadow-[0_24px_50px_-30px_rgba(0,0,0,0.7)]">
       <div className="border-b border-[#1E293B] bg-[#111827] px-5 py-4">
@@ -188,6 +191,9 @@ const InspectorPanel = () => {
               ) : (
                 <p className="text-xs text-[#94A3B8]">No incoming dependency records found.</p>
               )}
+            </InspectorSection>
+            <InspectorSection title="Tech Stack" description="Detected technologies from package.json files.">
+              <TechStackPanel items={zipTechStack} />
             </InspectorSection>
 
             <InspectorSection title="Summary" description="Lightweight note for the selected module.">
