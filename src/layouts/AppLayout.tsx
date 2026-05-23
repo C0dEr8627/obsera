@@ -3,6 +3,7 @@ import ZipUpload from '@/features/zip-upload/ZipUpload'
 import { useAppStore, useWorkspaceView } from '@/store'
 import CodeViewLayout from '@/layouts/CodeViewLayout'
 import VisualViewLayout from '@/layouts/VisualViewLayout'
+import ProcessingOverlay from '@/features/processing/components/ProcessingOverlay'
 
 const AppLayout = () => {
   const { activeView, setActiveView } = useWorkspaceView()
@@ -15,6 +16,8 @@ const AppLayout = () => {
 
         <TopNavigation activeView={activeView} onChange={setActiveView} />
       </header>
+
+      <ProcessingOverlay />
 
       {isZipReady ? (
         <>
