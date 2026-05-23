@@ -7,8 +7,10 @@ const sampleGraphNodes: GraphFlowNode[] = [
     type: 'graphNode',
     position: { x: 0, y: 0 },
     data: {
+      id: 'App.tsx',
       label: 'App.tsx',
-      filePath: 'src/App.tsx',
+      path: 'src/App.tsx',
+      fileType: 'TSX',
     },
   },
   {
@@ -16,8 +18,10 @@ const sampleGraphNodes: GraphFlowNode[] = [
     type: 'graphNode',
     position: { x: 280, y: 120 },
     data: {
+      id: 'Home.tsx',
       label: 'Home.tsx',
-      filePath: 'src/features/home/Home.tsx',
+      path: 'src/features/home/Home.tsx',
+      fileType: 'TSX',
     },
   },
   {
@@ -25,8 +29,10 @@ const sampleGraphNodes: GraphFlowNode[] = [
     type: 'graphNode',
     position: { x: 560, y: 240 },
     data: {
+      id: 'ProductCard.tsx',
       label: 'ProductCard.tsx',
-      filePath: 'src/components/ProductCard.tsx',
+      path: 'src/components/ProductCard.tsx',
+      fileType: 'TSX',
     },
   },
 ]
@@ -68,8 +74,11 @@ export const mapDependencyGraphToReactFlow = (
     id: node.id,
     type: 'graphNode',
     data: {
+      id: node.id,
       label: node.label,
-      filePath: node.filePath,
+      path: node.filePath,
+      fileType: node.filePath.split('.').pop()?.toUpperCase(),
+      metadata: node.position ? { x: node.position.x, y: node.position.y } : undefined,
     },
     position: node.position ?? { x: index * 260, y: (index % 2) * 140 },
   }))
