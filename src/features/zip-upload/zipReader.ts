@@ -234,7 +234,9 @@ export const readZipSummary = async (file: File): Promise<ZipReadSummary> => {
   const sampleFile = files[0] ?? null
   const extractedFiles: ExtractedFileInput[] = []
 
-  for (const entry of files) {
+  const totalFiles = files.length
+  for (let i = 0; i < totalFiles; i++) {
+    const entry = files[i]
     const path = normalizeZipPath(entry.name)
     const content = await entry.async('string')
     const fileName = getPathParts(path).at(-1) ?? ''
@@ -247,11 +249,13 @@ export const readZipSummary = async (file: File): Promise<ZipReadSummary> => {
         isText: true,
       },
     })
-  }
 
-  try {
-    setStage('parsing', { percent: 30, message: 'Parsing files' })
-  } catch {}
+    // update parsing progress incrementally
+    try {
+      const percent = Math.round(30 + ((i + 1) / Math.max(1, totalFiles)) * 35) // 30 -> 65
+      setStage('parsing', { percent, message: `Parsing files (${i + 1}/${totalFiles})` })
+    } catch {}
+  }
 
   const dependencyGraph = buildDependencyGraph(
     extractedFiles.map((file) => ({ path: file.path, content: file.content ?? '' })),
