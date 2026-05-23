@@ -5,12 +5,12 @@ import {
   type ExtractedFileInput,
 } from '@/utils/fileTreeGenerator'
 import {
-  buildDependencyGraph,
-  type DependencyGraphData,
-} from '@/utils/dependencyGraphGenerator'
-import { detectTechStack } from '@/features/tech-stack/utils/detectTechStack'
-import type { TechStackItem } from '@/features/tech-stack/types'
+    buildDependencyGraph,
+    type DependencyGraphData,
+  } from '@/utils/dependencyGraphGenerator'
 import { useAppStore } from '@/store'
+import { analyzeFiles } from '@/workers/workerClient'
+import type { TechStackItem } from '@/features/tech-stack/types'
 
 export interface ZipReadSummary {
   fileCount: number
@@ -257,23 +257,36 @@ export const readZipSummary = async (file: File): Promise<ZipReadSummary> => {
     } catch {}
   }
 
-  const dependencyGraph = buildDependencyGraph(
-    extractedFiles.map((file) => ({ path: file.path, content: file.content ?? '' })),
-  )
-
   try {
-    setStage('generatingGraph', { percent: 65, message: 'Generating dependency graph' })
+    setStage('generatingGraph', { percent: 65, message: 'Delegating analysis to worker' })
   } catch {}
 
   let techStack: TechStackItem[] = []
+  let dependencyGraph: DependencyGraphData
+
   try {
-    setStage('detectingTechStack', { percent: 80, message: 'Detecting tech stack' })
-    techStack = detectTechStack(extractedFiles)
+    const result = await analyzeFiles(
+      extractedFiles.map((f) => ({ path: f.path, content: f.content })),
+    )
+
+    dependencyGraph = result.dependencyGraph
+    techStack = result.techStack
   } catch (e) {
     try {
-      useAppStore.getState().setError(String(e ?? 'Tech stack detection failed'))
+      useAppStore.getState().setError(String(e ?? 'Worker analysis failed'))
       setStage('error')
     } catch {}
+    // fallback to local processing to remain resilient
+    dependencyGraph = buildDependencyGraph(
+      extractedFiles.map((file) => ({ path: file.path, content: file.content ?? '' })),
+    )
+    try {
+      // attempt local detection as fallback
+      const detect = await import('@/features/tech-stack/utils/detectTechStack')
+      techStack = detect.detectTechStack(extractedFiles as any)
+    } catch {
+      techStack = []
+    }
   }
 
   try {
