@@ -40,6 +40,7 @@ const ZipUpload = ({ compact = false }: ZipUploadProps) => {
   const acceptZipFile = useAppStore((state) => state.acceptZipFile)
   const rejectZipFile = useAppStore((state) => state.rejectZipFile)
   const setFileTree = useAppStore((state) => state.setFileTree)
+  const setDependencyGraph = useAppStore((state) => state.setDependencyGraph)
   const setZipUploadValidating = useAppStore(
     (state) => state.setZipUploadValidating,
   )
@@ -74,6 +75,7 @@ const ZipUpload = ({ compact = false }: ZipUploadProps) => {
     try {
       const summary = await readZipSummary(file)
       setFileTree(summary.fileTree)
+      setDependencyGraph(summary.dependencyGraph.nodes, summary.dependencyGraph.edges)
       acceptZipFile(
         file,
         summary.fileCount,

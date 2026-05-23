@@ -4,6 +4,10 @@ import {
   buildFileTree,
   type ExtractedFileInput,
 } from '@/utils/fileTreeGenerator'
+import {
+  buildDependencyGraph,
+  type DependencyGraphData,
+} from '@/utils/dependencyGraphGenerator'
 
 export interface ZipReadSummary {
   fileCount: number
@@ -11,6 +15,7 @@ export interface ZipReadSummary {
   sampleFileName: string | null
   sampleFileContent: string | null
   fileTree: FileNode[]
+  dependencyGraph: DependencyGraphData
 }
 
 const ignoredDirectoryNames = new Set([
@@ -235,6 +240,10 @@ export const readZipSummary = async (file: File): Promise<ZipReadSummary> => {
     })
   }
 
+  const dependencyGraph = buildDependencyGraph(
+    extractedFiles.map((file) => ({ path: file.path, content: file.content ?? '' })),
+  )
+
   return {
     fileCount: files.length,
     ignoredFileCount: allFiles.length - files.length,
@@ -247,5 +256,6 @@ export const readZipSummary = async (file: File): Promise<ZipReadSummary> => {
       files: extractedFiles,
       pruneEmptyFolders: true,
     }),
+    dependencyGraph,
   }
 }
