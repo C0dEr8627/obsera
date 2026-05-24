@@ -56,7 +56,7 @@ const CodeViewLayout = () => {
           onSelectFile={setActiveFileId}
         />
 
-        <section className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border border-[#1E293B] bg-[#111827] shadow-[0_24px_50px_-30px_rgba(0,0,0,0.7)]">
+        <section className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-[#1E293B] bg-[#111827] shadow-[0_24px_50px_-30px_rgba(0,0,0,0.7)]">
           <div className="shrink-0 border-b border-[#1E293B] px-4 py-3 sm:px-5">
             <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
               <div>

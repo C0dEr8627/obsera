@@ -3,6 +3,8 @@ import type { WorkerRequest, WorkerResponse } from './types/workerMessages'
 type Pending = {
   resolve: (value: any) => void
   reject: (reason?: any) => void
+  onProgress?: (payload: any) => void
+  expectTypes?: string[]
 }
 
 const createWorker = () => {
@@ -27,10 +29,17 @@ worker.onmessage = (ev: MessageEvent<WorkerResponse>) => {
   }
 
   if (msg.type === 'PROGRESS') {
-    // resolve progress notifications by calling resolve with partial? We'll pass progress updates via a callback in analyzeFiles
-    // For now, attach to payload for caller polling by awaiting promise that resolves on complete
-    // No-op here
+    if (p.onProgress) {
+      p.onProgress(msg.payload)
+    }
     return
+  }
+
+  // if expectTypes provided, only resolve when matching
+  if (p.expectTypes && p.expectTypes.length > 0) {
+    if (!p.expectTypes.includes(msg.type)) {
+      return
+    }
   }
 
   p.resolve(msg)
@@ -45,22 +54,74 @@ worker.onerror = (err) => {
   pending.clear()
 }
 
-export const analyzeFiles = (files: Array<{ path: string; content?: string }>) => {
-  return new Promise<{
-    dependencyGraph: any
-    techStack: any
-  }>((resolve, reject) => {
+export const analyzeFiles = (
+  files: Array<{ path: string; content?: string }>,
+  onProgress?: (payload: any) => void,
+) => {
+  return new Promise<{ dependencyGraph: any; techStack: any }>((resolve, reject) => {
     const id = `w_${idCounter++}`
     pending.set(id, {
       resolve: (msg: WorkerResponse) => {
         resolve(msg.payload as any)
       },
       reject,
+      onProgress,
+      expectTypes: ['ANALYSIS_COMPLETE'],
     })
 
     const request: WorkerRequest = {
       id,
       type: 'START_ANALYSIS',
+      payload: { files },
+    }
+
+    worker.postMessage(request)
+  })
+}
+
+export const dependencyScan = (
+  files: Array<{ path: string; content?: string }>,
+  onProgress?: (payload: any) => void,
+) => {
+  return new Promise<{ scanResults: any[] }>((resolve, reject) => {
+    const id = `w_${idCounter++}`
+    pending.set(id, {
+      resolve: (msg: WorkerResponse) => {
+        resolve(msg.payload as any)
+      },
+      reject,
+      onProgress,
+      expectTypes: ['DEPENDENCY_SCAN_COMPLETE'],
+    })
+
+    const request: WorkerRequest = {
+      id,
+      type: 'START_DEPENDENCY_SCAN',
+      payload: { files },
+    }
+
+    worker.postMessage(request)
+  })
+}
+
+export const generateGraph = (
+  files: Array<{ path: string; content?: string }>,
+  onProgress?: (payload: any) => void,
+) => {
+  return new Promise<{ dependencyGraph: any }>((resolve, reject) => {
+    const id = `w_${idCounter++}`
+    pending.set(id, {
+      resolve: (msg: WorkerResponse) => {
+        resolve(msg.payload as any)
+      },
+      reject,
+      onProgress,
+      expectTypes: ['GRAPH_GENERATION_COMPLETE'],
+    })
+
+    const request: WorkerRequest = {
+      id,
+      type: 'START_GRAPH_GENERATION',
       payload: { files },
     }
 

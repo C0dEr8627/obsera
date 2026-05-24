@@ -9,7 +9,7 @@ import {
     type DependencyGraphData,
   } from '@/utils/dependencyGraphGenerator'
 import { useAppStore } from '@/store'
-import { analyzeFiles } from '@/workers/workerClient'
+import { analyzeFiles, dependencyScan, generateGraph } from '@/workers/workerClient'
 import type { TechStackItem } from '@/features/tech-stack/types'
 
 export interface ZipReadSummary {
@@ -265,12 +265,53 @@ export const readZipSummary = async (file: File): Promise<ZipReadSummary> => {
   let dependencyGraph: DependencyGraphData
 
   try {
-    const result = await analyzeFiles(
+    // run dependency scan in worker and stream progress
+    await dependencyScan(
       extractedFiles.map((f) => ({ path: f.path, content: f.content })),
+      (progress: any) => {
+        try {
+          setStage('parsing', { percent: progress.percent, message: progress.message })
+        } catch {}
+      },
     )
 
-    dependencyGraph = result.dependencyGraph
-    techStack = result.techStack
+    // notify graph generation
+    try {
+      setStage('generatingGraph', { percent: 60, message: 'Worker: generating graph' })
+    } catch {}
+
+    const graphResult = await generateGraph(
+      extractedFiles.map((f) => ({ path: f.path, content: f.content })),
+      (progress: any) => {
+        try {
+          setStage('generatingGraph', { percent: progress.percent, message: progress.message })
+        } catch {}
+      },
+    )
+
+    dependencyGraph = graphResult.dependencyGraph
+
+    // detect tech stack inside worker via START_ANALYSIS path or locally
+    try {
+      const analysis = await analyzeFiles(
+        extractedFiles.map((f) => ({ path: f.path, content: f.content })),
+        (progress) => {
+          try {
+            setStage('detectingTechStack', { percent: progress.percent, message: progress.message })
+          } catch {}
+        },
+      )
+
+      techStack = analysis.techStack
+    } catch (e) {
+      // fallback local detection
+      try {
+        const detect = await import('@/features/tech-stack/utils/detectTechStack')
+        techStack = detect.detectTechStack(extractedFiles as any)
+      } catch {
+        techStack = []
+      }
+    }
   } catch (e) {
     try {
       useAppStore.getState().setError(String(e ?? 'Worker analysis failed'))
