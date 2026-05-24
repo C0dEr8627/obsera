@@ -1,4 +1,4 @@
-import { useMemo, useRef, useCallback } from 'react'
+import { useCallback, useMemo, useRef } from 'react'
 import ReactFlow, {
   Background,
   ReactFlowProvider,
@@ -71,7 +71,7 @@ const GraphCanvas = ({
 
   return (
     <ReactFlowProvider>
-      <div className="obsera-panel-in relative h-full w-full overflow-hidden rounded-3xl border border-[#1B2A41] bg-[#08101F] shadow-[inset_0_0_0_1px_rgba(148,163,184,0.08)] transition-colors duration-200">
+      <div className="obsera-panel-in relative h-full w-full overflow-hidden rounded-lg border border-[#1B2A41] bg-[#08101F] shadow-[inset_0_0_0_1px_rgba(148,163,184,0.08)] transition-colors duration-200">
         <ReactFlow
           nodes={graphData.nodes}
           edges={graphData.edges}
@@ -103,7 +103,7 @@ const GraphCanvas = ({
             type="button"
             aria-label="Zoom in"
             onClick={handleZoomIn}
-            className="rounded border border-[#213045] bg-[#0F172A]/80 px-2 py-1 text-xs font-medium text-[#D7DEEC] transition duration-150 hover:border-cyan-400/40 hover:bg-[#142B47] hover:text-white focus:outline-none focus:ring-1 focus:ring-cyan-400/50"
+            className="obsera-focus-ring rounded-md border border-[#213045] bg-[#0F172A]/80 px-2 py-1 text-xs font-medium text-[#D7DEEC] transition duration-150 hover:border-cyan-400/40 hover:bg-[#142B47] hover:text-white"
           >
             +
           </button>
@@ -111,17 +111,17 @@ const GraphCanvas = ({
             type="button"
             aria-label="Zoom out"
             onClick={handleZoomOut}
-            className="rounded border border-[#213045] bg-[#0F172A]/80 px-2 py-1 text-xs font-medium text-[#D7DEEC] transition duration-150 hover:border-cyan-400/40 hover:bg-[#142B47] hover:text-white focus:outline-none focus:ring-1 focus:ring-cyan-400/50"
+            className="obsera-focus-ring rounded-md border border-[#213045] bg-[#0F172A]/80 px-2 py-1 text-xs font-medium text-[#D7DEEC] transition duration-150 hover:border-cyan-400/40 hover:bg-[#142B47] hover:text-white"
           >
-            −
+            -
           </button>
           <button
             type="button"
             aria-label="Fit view"
             onClick={handleFitView}
-            className="rounded border border-[#213045] bg-[#0F172A]/80 px-2 py-1 text-xs font-medium text-[#D7DEEC] transition duration-150 hover:border-cyan-400/40 hover:bg-[#142B47] hover:text-white focus:outline-none focus:ring-1 focus:ring-cyan-400/50"
+            className="obsera-focus-ring rounded-md border border-[#213045] bg-[#0F172A]/80 px-2 py-1 text-xs font-medium text-[#D7DEEC] transition duration-150 hover:border-cyan-400/40 hover:bg-[#142B47] hover:text-white"
           >
-            ⤢
+            Fit
           </button>
         </div>
       </div>

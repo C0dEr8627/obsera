@@ -142,7 +142,7 @@ const ZipUpload = ({ compact = false }: ZipUploadProps) => {
   if (compact) {
     return (
       <div
-        className="shrink-0 border-b border-[#1E293B] bg-[#0E162A] px-4 py-2 sm:px-6"
+        className="shrink-0 border-b border-[var(--obsera-border)] bg-[#0E162A] px-4 py-2.5 sm:px-6"
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
@@ -168,7 +168,7 @@ const ZipUpload = ({ compact = false }: ZipUploadProps) => {
 
           <button
             type="button"
-            className="h-9 rounded-md border border-[#2D3A8C] bg-[#17203A] px-3 text-sm font-medium text-[#D7DEEC] transition duration-150 hover:border-cyan-400 hover:bg-[#1B2848] hover:text-white focus:outline-none focus:ring-2 focus:ring-cyan-400"
+            className="obsera-focus-ring h-9 rounded-md border border-[#2D3A8C] bg-[#17203A] px-3 text-sm font-medium text-[#D7DEEC] transition duration-150 hover:border-cyan-400 hover:bg-[#1B2848] hover:text-white"
             onClick={openFilePicker}
           >
             Replace ZIP
@@ -192,7 +192,7 @@ const ZipUpload = ({ compact = false }: ZipUploadProps) => {
   return (
     <main className="flex min-h-0 flex-1 items-center justify-center overflow-auto px-4 py-6 sm:px-6">
       <section
-        className={`flex w-full max-w-2xl flex-col items-center rounded-lg border border-dashed px-5 py-10 text-center transition-colors duration-150 sm:px-8 ${
+        className={`obsera-panel-in flex w-full max-w-2xl flex-col items-center rounded-lg border border-dashed px-5 py-10 text-center transition-colors duration-150 sm:px-8 ${
           isDragging
             ? 'border-cyan-300 bg-[#10243A]'
             : hasError
@@ -238,7 +238,7 @@ const ZipUpload = ({ compact = false }: ZipUploadProps) => {
 
         <button
           type="button"
-          className="mt-6 h-10 rounded-md bg-[#2D3A8C] px-4 text-sm font-semibold text-white transition duration-150 hover:bg-[#3648AD] hover:shadow-[0_0_24px_rgba(34,211,238,0.14)] focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-[#0F172A]"
+          className="obsera-focus-ring mt-6 h-10 rounded-md bg-[#2D3A8C] px-4 text-sm font-semibold text-white transition duration-150 hover:bg-[#3648AD] hover:shadow-[0_0_24px_rgba(34,211,238,0.14)]"
           onClick={openFilePicker}
         >
           Select ZIP

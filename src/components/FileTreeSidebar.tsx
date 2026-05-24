@@ -14,7 +14,7 @@ interface FileTreeNodeProps {
   activeFileId: string | null
   expandedFolders: Set<string>
   onSelectFile: (id: string) => void
-  onToggleFolder: (id: string) => void
+  onToggleFolder: (id: string, isExpanded: boolean) => void
 }
 
 const FolderIcon = () => (
@@ -117,7 +117,7 @@ const FileTreeNode = ({
 
   const handleClick = () => {
     if (isFolder) {
-      onToggleFolder(item.id)
+      onToggleFolder(item.id, isExpanded)
       return
     }
 
@@ -128,7 +128,7 @@ const FileTreeNode = ({
     <li>
       <button
         type="button"
-        className={`flex h-7 w-full items-center gap-1.5 rounded px-2 text-left text-[13px] transition duration-150 hover:bg-[#17203A] hover:text-white focus:outline-none focus:ring-1 focus:ring-cyan-400 ${
+        className={`obsera-focus-ring flex h-7 w-full items-center gap-1.5 rounded-md px-2 text-left text-[13px] transition duration-150 hover:bg-[#17203A] hover:text-white ${
           isActive
             ? 'bg-[#1D2B4F] text-white'
             : isFolder
@@ -140,8 +140,12 @@ const FileTreeNode = ({
         aria-expanded={isFolder ? isExpanded : undefined}
         onClick={handleClick}
       >
-        <span className="flex h-4 w-4 shrink-0 items-center justify-center text-[10px] text-[#7E8CAF]">
-          {isFolder ? (isExpanded ? 'v' : '>') : ''}
+        <span
+          className={`flex h-4 w-4 shrink-0 items-center justify-center text-[10px] text-[#7E8CAF] transition-transform duration-150 ${
+            isFolder && isExpanded ? 'rotate-90' : ''
+          }`}
+        >
+          {isFolder ? '>' : ''}
         </span>
         {isFolder ? <FolderIcon /> : <FileIcon />}
         <span className="min-w-0 truncate">{item.name}</span>
@@ -180,23 +184,27 @@ const FileTreeSidebar = ({
   const [expandedFolders, setExpandedFolders] = useState(
     () => new Set(activeAncestorIds),
   )
+  const [collapsedFolders, setCollapsedFolders] = useState<Set<string>>(
+    () => new Set(),
+  )
   const visibleExpandedFolders = useMemo(() => {
     const nextFolders = new Set(expandedFolders)
 
     activeAncestorIds.forEach((id) => nextFolders.add(id))
+    collapsedFolders.forEach((id) => nextFolders.delete(id))
 
     return nextFolders
-  }, [activeAncestorIds, expandedFolders])
+  }, [activeAncestorIds, collapsedFolders, expandedFolders])
 
   const allFoldersCollapsed =
     allFolderIds.length === 0 ||
     allFolderIds.every((id) => !visibleExpandedFolders.has(id))
 
-  const toggleFolder = (id: string) => {
+  const toggleFolder = (id: string, isExpanded: boolean) => {
     setExpandedFolders((currentFolders) => {
       const nextFolders = new Set(currentFolders)
 
-      if (nextFolders.has(id)) {
+      if (isExpanded) {
         nextFolders.delete(id)
       } else {
         nextFolders.add(id)
@@ -204,16 +212,26 @@ const FileTreeSidebar = ({
 
       return nextFolders
     })
+    setCollapsedFolders((currentFolders) => {
+      const nextFolders = new Set(currentFolders)
+
+      if (isExpanded) {
+        nextFolders.add(id)
+      } else {
+        nextFolders.delete(id)
+      }
+
+      return nextFolders
+    })
   }
 
   const toggleAllFolders = () => {
-    setExpandedFolders(
-      allFoldersCollapsed ? new Set(allFolderIds) : new Set(activeAncestorIds),
-    )
+    setExpandedFolders(allFoldersCollapsed ? new Set(allFolderIds) : new Set())
+    setCollapsedFolders(allFoldersCollapsed ? new Set() : new Set(allFolderIds))
   }
 
   return (
-    <aside className="obsera-panel-in flex min-h-0 max-h-48 w-full shrink-0 flex-col rounded-2xl border border-[#1E293B] bg-[#0F172A] shadow-[0_20px_45px_-30px_rgba(15,23,42,0.9)] transition-colors duration-200 lg:max-h-none lg:w-64">
+    <aside className="obsera-panel-in obsera-surface flex max-h-72 w-full shrink-0 flex-col overflow-hidden transition-colors duration-200 lg:max-h-none lg:w-64">
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0 px-3 py-3">
           <p className="truncate text-sm font-semibold uppercase tracking-[0.24em] text-[#A6B0CF]">
@@ -225,7 +243,7 @@ const FileTreeSidebar = ({
           <button
             type="button"
             onClick={toggleAllFolders}
-            className="rounded bg-[#1E293B] px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#A6B0CF] transition-colors duration-150 hover:bg-[#2D3E52] hover:text-[#CBD5E1] focus:outline-none focus:ring-1 focus:ring-cyan-400"
+            className="obsera-focus-ring rounded-md bg-[#1E293B] px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#A6B0CF] transition-colors duration-150 hover:bg-[#2D3E52] hover:text-[#CBD5E1]"
             title={
               allFoldersCollapsed
                 ? 'Expand all folders'
@@ -237,7 +255,7 @@ const FileTreeSidebar = ({
         </div>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-auto border-t border-[#1E293B] bg-[#0B1020] px-2 py-2">
+      <div className="min-h-0 flex-1 overflow-auto border-t border-[var(--obsera-border)] bg-[var(--obsera-bg)] px-2 py-2">
         {items.length > 0 ? (
           <ul className="space-y-0.5 text-sm text-[#A6B0CF]">
             {items.map((item) => (

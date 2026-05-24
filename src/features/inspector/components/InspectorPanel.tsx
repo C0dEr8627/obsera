@@ -1,10 +1,9 @@
 import { useMemo } from 'react'
-import { useDependencyGraph, useFileTree, useAppStore } from '@/store'
+import { useDependencyGraph, useFileTree } from '@/store'
 import type { FileTreeNode } from '@/types/fileNode'
 import type { InspectorModuleInfo } from '../types'
 import { generateModuleSummary } from '@/features/module-summary/utils/generateModuleSummary'
 import InspectorSection from './InspectorSection'
-import TechStackPanel from '@/features/tech-stack/components/TechStackPanel'
 
 const findFileNodeById = (
   nodes: FileTreeNode[],
@@ -116,20 +115,18 @@ const InspectorPanel = () => {
     [selectedGraphNode, activeGraphNode, activeFile, graphEdges],
   )
 
-  const zipTechStack = useAppStore((state) => state.zipTechStack)
-
   return (
-    <aside className="flex min-h-0 w-full flex-col overflow-hidden rounded-3xl border border-[#1E293B] bg-[#0B1020] shadow-[0_24px_50px_-30px_rgba(0,0,0,0.7)] transition-colors duration-200">
-      <div className="border-b border-[#1E293B] bg-[#111827] px-5 py-4">
+    <aside className="obsera-surface flex w-full flex-col overflow-hidden transition-colors duration-200">
+      <div className="obsera-panel-header px-5 py-4">
         <p className="text-sm font-semibold text-white">Module Inspector</p>
         <p className="mt-1 text-xs text-[#94A3B8]">
           View metadata for the currently selected module or file.
         </p>
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col overflow-auto p-4 sm:p-5">
+      <div className="flex flex-col p-4 sm:p-5">
         {!moduleInfo ? (
-          <div className="mx-auto flex w-full max-w-[340px] flex-col items-center justify-center rounded-3xl border border-dashed border-[#334155] bg-[#111827] p-6 text-center">
+          <div className="mx-auto flex w-full max-w-[340px] flex-col items-center justify-center rounded-lg border border-dashed border-[#334155] bg-[#111827] p-6 text-center">
             <p className="text-sm font-semibold text-white">
               No module selected
             </p>
@@ -145,7 +142,7 @@ const InspectorPanel = () => {
               description="Basic module metadata and selection source."
             >
               <div className="space-y-2">
-                <div className="rounded-2xl bg-[#0F172A] p-3">
+                <div className="rounded-lg border border-[#1E293B] bg-[#0F172A] p-3">
                   <p className="text-sm font-semibold text-white">
                     {moduleInfo.name}
                   </p>
@@ -154,7 +151,7 @@ const InspectorPanel = () => {
                   </p>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <div className="rounded-2xl bg-[#0F172A] p-3">
+                  <div className="rounded-lg border border-[#1E293B] bg-[#0F172A] p-3">
                     <p className="text-[11px] uppercase tracking-[0.22em] text-[#94A3B8]">
                       File type
                     </p>
@@ -162,7 +159,7 @@ const InspectorPanel = () => {
                       {moduleInfo.fileType}
                     </p>
                   </div>
-                  <div className="rounded-2xl bg-[#0F172A] p-3">
+                  <div className="rounded-lg border border-[#1E293B] bg-[#0F172A] p-3">
                     <p className="text-[11px] uppercase tracking-[0.22em] text-[#94A3B8]">
                       Source
                     </p>
@@ -181,7 +178,7 @@ const InspectorPanel = () => {
               description="Modules imported by the selected module."
             >
               <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-2xl bg-[#0F172A] p-3">
+                <div className="rounded-lg border border-[#1E293B] bg-[#0F172A] p-3">
                   <p className="text-[11px] uppercase tracking-[0.22em] text-[#94A3B8]">
                     Import count
                   </p>
@@ -189,7 +186,7 @@ const InspectorPanel = () => {
                     {moduleInfo.importCount}
                   </p>
                 </div>
-                <div className="rounded-2xl bg-[#0F172A] p-3">
+                <div className="rounded-lg border border-[#1E293B] bg-[#0F172A] p-3">
                   <p className="text-[11px] uppercase tracking-[0.22em] text-[#94A3B8]">
                     Imported by
                   </p>
@@ -208,7 +205,7 @@ const InspectorPanel = () => {
                     {moduleInfo.importedModules.map((item) => (
                       <li
                         key={item}
-                        className="rounded-2xl bg-[#0F172A] px-3 py-2 text-sm text-[#E2E8F0]"
+                        className="rounded-lg border border-[#1E293B] bg-[#0F172A] px-3 py-2 text-sm text-[#E2E8F0]"
                       >
                         {item}
                       </li>
@@ -231,7 +228,7 @@ const InspectorPanel = () => {
                   {moduleInfo.importedByModules.map((item) => (
                     <li
                       key={item}
-                      className="rounded-2xl bg-[#0F172A] px-3 py-2 text-sm text-[#E2E8F0]"
+                      className="rounded-lg border border-[#1E293B] bg-[#0F172A] px-3 py-2 text-sm text-[#E2E8F0]"
                     >
                       {item}
                     </li>
@@ -244,17 +241,10 @@ const InspectorPanel = () => {
               )}
             </InspectorSection>
             <InspectorSection
-              title="Tech Stack"
-              description="Detected technologies from package.json files."
-            >
-              <TechStackPanel items={zipTechStack} />
-            </InspectorSection>
-
-            <InspectorSection
               title="Summary"
               description="Lightweight note for the selected module."
             >
-              <p className="rounded-2xl bg-[#0F172A] p-3 text-sm text-[#CBD5E1]">
+              <p className="rounded-lg border border-[#1E293B] bg-[#0F172A] p-3 text-sm text-[#CBD5E1]">
                 {moduleInfo.summary}
               </p>
             </InspectorSection>
