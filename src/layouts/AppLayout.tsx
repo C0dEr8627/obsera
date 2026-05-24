@@ -4,6 +4,7 @@ import { useAppStore, useWorkspaceView } from '@/store'
 import CodeViewLayout from '@/layouts/CodeViewLayout'
 import VisualViewLayout from '@/layouts/VisualViewLayout'
 import ProcessingOverlay from '@/features/processing/components/ProcessingOverlay'
+import TechStackCard from '@/features/tech-stack/components/TechStackCard'
 
 const AppLayout = () => {
   const { activeView, setActiveView } = useWorkspaceView()
@@ -22,6 +23,7 @@ const AppLayout = () => {
       {isZipReady ? (
         <>
           <ZipUpload compact />
+          <TechStackCard />
           {activeView === 'code' ? <CodeViewLayout /> : <VisualViewLayout />}
         </>
       ) : (

@@ -213,7 +213,7 @@ const FileTreeSidebar = ({
   }
 
   return (
-    <aside className="flex min-h-0 max-h-48 w-full shrink-0 flex-col rounded-lg border border-[#1E293B] bg-[#0F172A] shadow-[0_20px_45px_-30px_rgba(15,23,42,0.9)] lg:max-h-none lg:w-64">
+    <aside className="flex min-h-0 max-h-48 w-full shrink-0 flex-col rounded-2xl border border-[#1E293B] bg-[#0F172A] shadow-[0_20px_45px_-30px_rgba(15,23,42,0.9)] lg:max-h-none lg:w-64">
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0 px-3 py-3">
           <p className="truncate text-sm font-semibold uppercase tracking-[0.24em] text-[#A6B0CF]">
