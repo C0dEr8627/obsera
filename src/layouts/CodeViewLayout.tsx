@@ -48,8 +48,8 @@ const CodeViewLayout = () => {
     : 'Select a source file from the file tree to preview its contents.'
 
   return (
-    <main className="obsera-fade-in flex min-h-0 flex-1 overflow-auto px-3 py-3 sm:px-5 sm:py-4">
-      <div className="flex min-h-0 flex-1 flex-col gap-3 lg:flex-row">
+    <main className="obsera-fade-in w-full px-3 py-3 sm:px-5 sm:py-4">
+      <div className="flex w-full flex-col gap-3 xl:gap-4 lg:flex-row">
         <FileTreeSidebar
           title={zipFileName || 'File Explorer'}
           items={fileTree}
@@ -57,8 +57,8 @@ const CodeViewLayout = () => {
           onSelectFile={setActiveFileId}
         />
 
-        <section className="obsera-panel-in flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-[#1E293B] bg-[#111827] shadow-[0_24px_50px_-30px_rgba(0,0,0,0.7)] transition-colors duration-200">
-          <div className="shrink-0 border-b border-[#1E293B] px-4 py-3 sm:px-5">
+        <section className="obsera-panel-in obsera-surface flex min-h-0 flex-1 flex-col overflow-hidden transition-colors duration-200">
+          <div className="obsera-panel-header shrink-0 px-4 py-3 sm:px-5">
             <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="text-sm font-semibold text-white">
@@ -68,13 +68,13 @@ const CodeViewLayout = () => {
                   Read-only source inspection
                 </p>
               </div>
-              <span className="mt-2 inline-flex items-center rounded bg-[#1E293B] px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#A6B0CF] sm:mt-0">
+              <span className="obsera-chip mt-2 sm:mt-0">
                 Read-only preview
               </span>
             </div>
           </div>
 
-          <div className="flex min-h-0 flex-1 overflow-hidden p-3 sm:p-5">
+          <div className="flex flex-1 p-3 sm:p-5">
             <ErrorBoundary
               key={activeFileId ?? 'empty-editor'}
               boundaryName="code-viewer"

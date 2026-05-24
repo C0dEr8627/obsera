@@ -17,9 +17,9 @@ const ErrorFallback = ({
 }: ErrorFallbackProps) => (
   <div
     role="alert"
-    className={`flex min-h-[220px] w-full flex-1 items-center justify-center rounded-lg border border-[#243044] bg-[#0B1020] p-5 text-[#E6EAF5] shadow-inner shadow-black/30 ${className}`}
+    className={`flex min-h-[220px] w-full flex-1 items-center justify-center rounded-lg border border-[#243044] bg-[var(--obsera-bg)] p-5 text-[var(--obsera-text)] shadow-inner shadow-black/30 ${className}`}
   >
-    <div className="w-full max-w-md rounded-lg border border-[#1E293B] bg-[#111827] p-5">
+    <div className="obsera-surface-muted w-full max-w-md p-5">
       <div className="mb-4 flex items-center gap-3">
         <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded border border-rose-500/30 bg-rose-500/10 text-sm font-semibold text-rose-200">
           !
@@ -35,7 +35,7 @@ const ErrorFallback = ({
           <button
             type="button"
             onClick={onRetry}
-            className="rounded border border-cyan-400/30 bg-cyan-400/10 px-3 py-2 text-xs font-semibold text-cyan-100 transition hover:bg-cyan-400/20 focus:outline-none focus:ring-2 focus:ring-cyan-300/40"
+            className="obsera-focus-ring rounded-md border border-cyan-400/30 bg-cyan-400/10 px-3 py-2 text-xs font-semibold text-cyan-100 transition hover:bg-cyan-400/20"
           >
             {actionLabel}
           </button>
@@ -44,7 +44,7 @@ const ErrorFallback = ({
           <button
             type="button"
             onClick={() => window.location.reload()}
-            className="rounded border border-[#334155] bg-[#0F172A] px-3 py-2 text-xs font-semibold text-[#D7DEEC] transition hover:bg-[#162033] focus:outline-none focus:ring-2 focus:ring-[#64748B]/40"
+            className="obsera-focus-ring rounded-md border border-[#334155] bg-[#0F172A] px-3 py-2 text-xs font-semibold text-[#D7DEEC] transition hover:bg-[#162033]"
           >
             Reload project
           </button>

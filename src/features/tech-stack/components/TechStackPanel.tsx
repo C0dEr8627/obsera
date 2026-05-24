@@ -14,7 +14,7 @@ const categoryOrder: Array<{ key: string; label: string }> = [
 ]
 
 const TechStackPanel = ({ items }: TechStackPanelProps) => {
-  const safeItems = items ?? []
+  const safeItems = useMemo(() => items ?? [], [items])
 
   const byCategory = useMemo(() => {
     const map = new Map<string, TechStackItem[]>()
@@ -33,7 +33,7 @@ const TechStackPanel = ({ items }: TechStackPanelProps) => {
 
   if (safeItems.length === 0) {
     return (
-      <div className="rounded-2xl bg-[#0F172A] p-3 text-sm text-[#94A3B8]">
+      <div className="rounded-lg border border-[#1E293B] bg-[#0F172A] p-3 text-sm text-[#94A3B8]">
         No detected technologies found in package.json files.
       </div>
     )
@@ -47,7 +47,9 @@ const TechStackPanel = ({ items }: TechStackPanelProps) => {
 
         return (
           <div key={cat.key}>
-            <p className="text-[11px] uppercase tracking-[0.18em] text-[#94A3B8]">{cat.label}</p>
+            <p className="text-[11px] uppercase tracking-[0.16em] text-[#94A3B8]">
+              {cat.label}
+            </p>
             <div className="mt-2 flex flex-wrap gap-2">
               {list.map((item) => (
                 <TechBadge key={item.name} item={item} />

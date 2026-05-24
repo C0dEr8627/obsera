@@ -16,8 +16,8 @@ const AppLayout = () => {
   )
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-[#0B1020] text-[#E6EAF5]">
-      <header className="flex shrink-0 flex-col gap-2 border-b border-[#1E293B] bg-[#121A33] px-4 py-3 sm:h-14 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-0">
+    <div className="flex min-h-screen flex-col bg-[var(--obsera-bg)] text-[var(--obsera-text)]">
+      <header className="flex shrink-0 flex-col gap-2 border-b border-[var(--obsera-border)] bg-[#121A33] px-4 py-3 sm:h-14 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-0">
         <h1 className="text-lg font-semibold tracking-wide">Obsera</h1>
 
         <TopNavigation activeView={activeView} onChange={setActiveView} />
@@ -33,7 +33,7 @@ const AppLayout = () => {
             key={activeView}
             boundaryName={`${activeView}-workspace-layout`}
             fallbackMessage="Try reloading the project."
-            className="min-h-0 flex-1 rounded-none"
+            className="rounded-none"
           >
             {activeView === 'code' ? <CodeViewLayout /> : <VisualViewLayout />}
           </ErrorBoundary>

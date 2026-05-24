@@ -11,15 +11,13 @@ const MonacoWorkspaceContainer = ({
   source,
   emptyMessage,
 }: MonacoWorkspaceContainerProps) => (
-  <div className="obsera-panel-in flex min-h-0 w-full flex-1 flex-col overflow-hidden rounded-lg border border-[#1E293B] bg-[#0B1020] shadow-inner shadow-black/40 transition-colors duration-200">
-    <div className="flex h-10 shrink-0 items-center justify-between gap-4 border-b border-[#1E293B] bg-[#131D33] px-4 text-sm text-[#E6EAF5]">
+  <div className="obsera-panel-in flex min-h-0 w-full flex-1 flex-col overflow-hidden rounded-lg border border-[var(--obsera-border)] bg-[var(--obsera-bg)] shadow-inner shadow-black/40 transition-colors duration-200">
+    <div className="flex h-11 shrink-0 items-center justify-between gap-4 border-b border-[var(--obsera-border)] bg-[#131D33] px-4 text-sm text-[var(--obsera-text)]">
       <div className="min-w-0">
         <p className="truncate font-medium">{fileName}</p>
         <p className="truncate text-[11px] text-[#7E8CAF]">{filePath}</p>
       </div>
-      <span className="shrink-0 rounded bg-[#1E293B] px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#A6B0CF]">
-        Preview
-      </span>
+      <span className="obsera-chip shrink-0">Preview</span>
     </div>
 
     <div

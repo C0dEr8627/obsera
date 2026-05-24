@@ -15,10 +15,13 @@ const TechStackCard = () => {
 
   if (zipStatus !== 'ready') return null
 
-  const byCategory = categoryOrder.reduce<Record<string, TechStackItem[]>>((acc, cat) => {
-    acc[cat.key] = []
-    return acc
-  }, {})
+  const byCategory = categoryOrder.reduce<Record<string, TechStackItem[]>>(
+    (acc, cat) => {
+      acc[cat.key] = []
+      return acc
+    },
+    {},
+  )
 
   for (const item of zipTechStack ?? []) {
     const list = byCategory[item.category] ?? []
@@ -29,31 +32,36 @@ const TechStackCard = () => {
   }
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-3 sm:px-6">
-      <div className="rounded-2xl border border-[#1E293B] bg-[#071021] p-4 shadow-[0_12px_30px_-20px_rgba(0,0,0,0.6)]">
-        <div className="w-full">
-          <div className="w-full">
-            <p className="text-base font-semibold text-white">Tech Stack</p>
-            <p className="mt-1 text-sm text-[#94A3B8]">Detected technologies from the uploaded project</p>
-          </div>
+    <div className="mx-auto w-full px-3 py-3 sm:px-5">
+      <div className="obsera-surface obsera-panel-in p-4">
+        <p className="text-sm font-semibold text-white">Tech Stack</p>
+        <p className="mt-1 text-xs text-[#94A3B8]">
+          Detected technologies from the uploaded project
+        </p>
 
-          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
-            {categoryOrder.map((cat) => {
-              const list = byCategory[cat.key] ?? []
-              return (
-                <div key={cat.key} className="rounded-lg bg-[#0F172A] p-3">
-                  <p className="text-[11px] uppercase tracking-[0.18em] text-[#94A3B8]">{cat.label}</p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {list.length > 0 ? (
-                      list.map((item) => <TechBadge key={item.name} item={item} />)
-                    ) : (
-                      <p className="text-xs text-[#94A3B8]">—</p>
-                    )}
-                  </div>
+        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4">
+          {categoryOrder.map((cat) => {
+            const list = byCategory[cat.key] ?? []
+            return (
+              <div
+                key={cat.key}
+                className="rounded-lg border border-[#1E293B] bg-[#0B1020] p-3"
+              >
+                <p className="text-[11px] uppercase tracking-[0.16em] text-[#94A3B8]">
+                  {cat.label}
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {list.length > 0 ? (
+                    list.map((item) => (
+                      <TechBadge key={item.name} item={item} />
+                    ))
+                  ) : (
+                    <p className="text-xs text-[#94A3B8]">None detected</p>
+                  )}
                 </div>
-              )
-            })}
-          </div>
+              </div>
+            )
+          })}
         </div>
       </div>
     </div>
