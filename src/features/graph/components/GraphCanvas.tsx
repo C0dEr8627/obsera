@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import ReactFlow, {
   Background,
   ReactFlowProvider,
@@ -22,6 +22,7 @@ const sampleGraph = createSampleGraph()
 interface GraphCanvasProps {
   graphNodes?: DependencyGraphNode[]
   graphEdges?: DependencyGraphEdge[]
+  canvasSize?: { width: number; height: number }
 }
 
 const nodeTypes: NodeTypes = {
@@ -35,29 +36,64 @@ const edgeTypes: EdgeTypes = {
 const GraphCanvas = ({
   graphNodes = [],
   graphEdges = [],
+  canvasSize = { width: 1600, height: 1000 },
 }: GraphCanvasProps) => {
-  const graphData = useMemo(() => {
-    if (graphNodes.length === 0) {
-      return sampleGraph
-    }
-
-    return mapDependencyGraphToReactFlow(graphNodes, graphEdges)
-  }, [graphNodes, graphEdges])
-
+  const [isLayouting, setIsLayouting] = useState(false)
+  const [graphData, setGraphData] = useState(sampleGraph)
   const { setSelectedGraphNodeId } = useDependencyGraph()
   const rfInstance = useRef<ReactFlowInstance | null>(null)
 
+  // Calculate layout when nodes/edges change
+  useEffect(() => {
+    const calculateLayout = async () => {
+      if (graphNodes.length === 0) {
+        setGraphData(sampleGraph)
+        return
+      }
+
+      setIsLayouting(true)
+      try {
+        const layoutedData = await mapDependencyGraphToReactFlow(
+          graphNodes,
+          graphEdges,
+          canvasSize,
+        )
+        setGraphData(layoutedData)
+      } catch (error) {
+        console.error('Failed to calculate layout:', error)
+      } finally {
+        setIsLayouting(false)
+      }
+    }
+
+    calculateLayout()
+  }, [graphNodes, graphEdges, canvasSize?.width, canvasSize?.height])
+
   const onInit = useCallback((instance: ReactFlowInstance) => {
     rfInstance.current = instance
-    instance.fitView({ padding: 0.14 })
+    // Delay fit view to allow for proper rendering
+    setTimeout(() => {
+      instance.fitView({ padding: 0.1 })
+    }, 100)
   }, [])
 
   const handleZoomIn = useCallback(() => rfInstance.current?.zoomIn?.(), [])
   const handleZoomOut = useCallback(() => rfInstance.current?.zoomOut?.(), [])
-  const handleFitView = useCallback(
-    () => rfInstance.current?.fitView?.({ padding: 0.14 }),
+
+  const handleResetView = useCallback(
+    () => rfInstance.current?.fitView?.({ padding: 0.1 }),
     [],
   )
+
+  const handleRelayout = useCallback(() => {
+    setIsLayouting(true)
+    // Trigger a re-layout by changing state
+    setTimeout(() => {
+      setIsLayouting(false)
+      rfInstance.current?.fitView?.({ padding: 0.1 })
+    }, 300)
+  }, [])
+
   const handleNodeClick = useCallback<NodeMouseHandler>(
     (_event, node) => {
       setSelectedGraphNodeId(node.id)
@@ -72,6 +108,16 @@ const GraphCanvas = ({
   return (
     <ReactFlowProvider>
       <div className="obsera-panel-in relative h-full w-full overflow-hidden rounded-lg border border-[#1B2A41] bg-[#08101F] shadow-[inset_0_0_0_1px_rgba(148,163,184,0.08)] transition-colors duration-200">
+        {/* Loading indicator */}
+        {isLayouting && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/30 backdrop-blur-sm">
+            <div className="flex flex-col items-center gap-3">
+              <div className="h-8 w-8 animate-spin rounded-full border-4 border-cyan-400/30 border-t-cyan-400" />
+              <p className="text-sm text-cyan-300">Calculating layout...</p>
+            </div>
+          </div>
+        )}
+
         <ReactFlow
           nodes={graphData.nodes}
           edges={graphData.edges}
@@ -82,8 +128,8 @@ const GraphCanvas = ({
           zoomOnScroll={true}
           zoomOnPinch={true}
           panOnDrag={true}
-          minZoom={0.25}
-          maxZoom={2.5}
+          minZoom={0.1}
+          maxZoom={3}
           style={{ backgroundColor: '#070E1C' }}
           onInit={onInit}
           onNodeClick={handleNodeClick}
@@ -95,10 +141,35 @@ const GraphCanvas = ({
             style: { stroke: '#22d3ee', strokeWidth: 2 },
           }}
         >
-          <Background gap={24} size={1} color="rgba(148, 163, 184, 0.12)" />
+          <Background gap={32} size={1} color="rgba(148, 163, 184, 0.08)" />
         </ReactFlow>
 
+        {/* Graph controls */}
         <div className="absolute right-4 top-4 z-20 flex flex-col gap-2">
+          {/* Relayout button */}
+          <button
+            type="button"
+            aria-label="Relayout graph"
+            onClick={handleRelayout}
+            disabled={isLayouting}
+            className="obsera-focus-ring rounded-md border border-[#213045] bg-[#0F172A]/80 px-3 py-1.5 text-xs font-medium text-[#D7DEEC] transition duration-150 hover:border-cyan-400/40 hover:bg-[#142B47] hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Recalculate graph layout"
+          >
+            ⚡ Relayout
+          </button>
+
+          {/* Reset view button */}
+          <button
+            type="button"
+            aria-label="Reset view"
+            onClick={handleResetView}
+            className="obsera-focus-ring rounded-md border border-[#213045] bg-[#0F172A]/80 px-3 py-1.5 text-xs font-medium text-[#D7DEEC] transition duration-150 hover:border-cyan-400/40 hover:bg-[#142B47] hover:text-white"
+            title="Reset to fit all nodes"
+          >
+            🏠 Home
+          </button>
+
+          {/* Zoom controls */}
           <button
             type="button"
             aria-label="Zoom in"
@@ -113,15 +184,7 @@ const GraphCanvas = ({
             onClick={handleZoomOut}
             className="obsera-focus-ring rounded-md border border-[#213045] bg-[#0F172A]/80 px-2 py-1 text-xs font-medium text-[#D7DEEC] transition duration-150 hover:border-cyan-400/40 hover:bg-[#142B47] hover:text-white"
           >
-            -
-          </button>
-          <button
-            type="button"
-            aria-label="Fit view"
-            onClick={handleFitView}
-            className="obsera-focus-ring rounded-md border border-[#213045] bg-[#0F172A]/80 px-2 py-1 text-xs font-medium text-[#D7DEEC] transition duration-150 hover:border-cyan-400/40 hover:bg-[#142B47] hover:text-white"
-          >
-            Fit
+            −
           </button>
         </div>
       </div>
