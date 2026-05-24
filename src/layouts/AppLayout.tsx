@@ -5,6 +5,7 @@ import CodeViewLayout from '@/layouts/CodeViewLayout'
 import VisualViewLayout from '@/layouts/VisualViewLayout'
 import ProcessingOverlay from '@/features/processing/components/ProcessingOverlay'
 import TechStackCard from '@/features/tech-stack/components/TechStackCard'
+import ErrorBoundary from '@/components/error/ErrorBoundary'
 
 const AppLayout = () => {
   const { activeView, setActiveView } = useWorkspaceView()
@@ -24,7 +25,14 @@ const AppLayout = () => {
         <>
           <ZipUpload compact />
           <TechStackCard />
-          {activeView === 'code' ? <CodeViewLayout /> : <VisualViewLayout />}
+          <ErrorBoundary
+            key={activeView}
+            boundaryName={`${activeView}-workspace-layout`}
+            fallbackMessage="Try reloading the project."
+            className="min-h-0 flex-1 rounded-none"
+          >
+            {activeView === 'code' ? <CodeViewLayout /> : <VisualViewLayout />}
+          </ErrorBoundary>
         </>
       ) : (
         <ZipUpload />

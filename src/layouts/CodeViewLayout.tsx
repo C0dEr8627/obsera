@@ -1,5 +1,6 @@
 import FileTreeSidebar from '@/components/FileTreeSidebar'
 import MonacoWorkspaceContainer from '@/components/MonacoWorkspaceContainer'
+import ErrorBoundary from '@/components/error/ErrorBoundary'
 import {
   useAppStore,
   useFileTree,
@@ -74,12 +75,19 @@ const CodeViewLayout = () => {
           </div>
 
           <div className="flex min-h-0 flex-1 overflow-hidden p-3 sm:p-5">
-            <MonacoWorkspaceContainer
-              fileName={activeFileName}
-              filePath={activeFilePath}
-              source={activeFileSource}
-              emptyMessage={editorEmptyMessage}
-            />
+            <ErrorBoundary
+              key={activeFileId ?? 'empty-editor'}
+              boundaryName="code-viewer"
+              fallbackMessage="Try selecting the file again or reloading the project."
+              className="min-h-[360px]"
+            >
+              <MonacoWorkspaceContainer
+                fileName={activeFileName}
+                filePath={activeFilePath}
+                source={activeFileSource}
+                emptyMessage={editorEmptyMessage}
+              />
+            </ErrorBoundary>
           </div>
         </section>
       </div>
