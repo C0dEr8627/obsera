@@ -5,11 +5,15 @@ import ReactFlow, {
   type EdgeTypes,
   type NodeMouseHandler,
   type NodeTypes,
+  type ReactFlowInstance,
 } from 'reactflow'
 import 'reactflow/dist/style.css'
 import GraphEdge from './GraphEdge'
 import GraphNode from './GraphNode'
-import { createSampleGraph, mapDependencyGraphToReactFlow } from '../utils/graphUtils'
+import {
+  createSampleGraph,
+  mapDependencyGraphToReactFlow,
+} from '../utils/graphUtils'
 import { useDependencyGraph } from '@/store'
 import type { DependencyGraphEdge, DependencyGraphNode } from '@/store'
 
@@ -28,7 +32,10 @@ const edgeTypes: EdgeTypes = {
   dependencyEdge: GraphEdge,
 }
 
-const GraphCanvas = ({ graphNodes = [], graphEdges = [] }: GraphCanvasProps) => {
+const GraphCanvas = ({
+  graphNodes = [],
+  graphEdges = [],
+}: GraphCanvasProps) => {
   const graphData = useMemo(() => {
     if (graphNodes.length === 0) {
       return sampleGraph
@@ -38,16 +45,19 @@ const GraphCanvas = ({ graphNodes = [], graphEdges = [] }: GraphCanvasProps) => 
   }, [graphNodes, graphEdges])
 
   const { setSelectedGraphNodeId } = useDependencyGraph()
-  const rfInstance = useRef<any | null>(null)
+  const rfInstance = useRef<ReactFlowInstance | null>(null)
 
-  const onInit = useCallback((instance: any) => {
+  const onInit = useCallback((instance: ReactFlowInstance) => {
     rfInstance.current = instance
     instance.fitView({ padding: 0.14 })
   }, [])
 
   const handleZoomIn = useCallback(() => rfInstance.current?.zoomIn?.(), [])
   const handleZoomOut = useCallback(() => rfInstance.current?.zoomOut?.(), [])
-  const handleFitView = useCallback(() => rfInstance.current?.fitView?.({ padding: 0.14 }), [])
+  const handleFitView = useCallback(
+    () => rfInstance.current?.fitView?.({ padding: 0.14 }),
+    [],
+  )
   const handleNodeClick = useCallback<NodeMouseHandler>(
     (_event, node) => {
       setSelectedGraphNodeId(node.id)
@@ -61,7 +71,7 @@ const GraphCanvas = ({ graphNodes = [], graphEdges = [] }: GraphCanvasProps) => 
 
   return (
     <ReactFlowProvider>
-      <div className="h-full w-full overflow-hidden rounded-3xl border border-[#1B2A41] bg-[#08101F] shadow-[inset_0_0_0_1px_rgba(148,163,184,0.08)] relative">
+      <div className="obsera-panel-in relative h-full w-full overflow-hidden rounded-3xl border border-[#1B2A41] bg-[#08101F] shadow-[inset_0_0_0_1px_rgba(148,163,184,0.08)] transition-colors duration-200">
         <ReactFlow
           nodes={graphData.nodes}
           edges={graphData.edges}
@@ -93,7 +103,7 @@ const GraphCanvas = ({ graphNodes = [], graphEdges = [] }: GraphCanvasProps) => 
             type="button"
             aria-label="Zoom in"
             onClick={handleZoomIn}
-            className="rounded border border-[#213045] bg-[#0F172A]/80 px-2 py-1 text-xs font-medium text-[#D7DEEC] hover:bg-[#142B47]"
+            className="rounded border border-[#213045] bg-[#0F172A]/80 px-2 py-1 text-xs font-medium text-[#D7DEEC] transition duration-150 hover:border-cyan-400/40 hover:bg-[#142B47] hover:text-white focus:outline-none focus:ring-1 focus:ring-cyan-400/50"
           >
             +
           </button>
@@ -101,7 +111,7 @@ const GraphCanvas = ({ graphNodes = [], graphEdges = [] }: GraphCanvasProps) => 
             type="button"
             aria-label="Zoom out"
             onClick={handleZoomOut}
-            className="rounded border border-[#213045] bg-[#0F172A]/80 px-2 py-1 text-xs font-medium text-[#D7DEEC] hover:bg-[#142B47]"
+            className="rounded border border-[#213045] bg-[#0F172A]/80 px-2 py-1 text-xs font-medium text-[#D7DEEC] transition duration-150 hover:border-cyan-400/40 hover:bg-[#142B47] hover:text-white focus:outline-none focus:ring-1 focus:ring-cyan-400/50"
           >
             −
           </button>
@@ -109,7 +119,7 @@ const GraphCanvas = ({ graphNodes = [], graphEdges = [] }: GraphCanvasProps) => 
             type="button"
             aria-label="Fit view"
             onClick={handleFitView}
-            className="rounded border border-[#213045] bg-[#0F172A]/80 px-2 py-1 text-xs font-medium text-[#D7DEEC] hover:bg-[#142B47]"
+            className="rounded border border-[#213045] bg-[#0F172A]/80 px-2 py-1 text-xs font-medium text-[#D7DEEC] transition duration-150 hover:border-cyan-400/40 hover:bg-[#142B47] hover:text-white focus:outline-none focus:ring-1 focus:ring-cyan-400/50"
           >
             ⤢
           </button>

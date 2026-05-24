@@ -17,8 +17,13 @@ const stageLabels: Record<ProcessingStageKey, string> = {
 
 const ProcessingStageView = ({ stage }: ProcessingStageProps) => {
   return (
-    <div className="text-center">
-      <p className="text-sm font-semibold text-white">{stageLabels[stage] ?? stage}</p>
+    <div key={stage} className="obsera-panel-in text-center">
+      <p className="text-sm font-semibold text-white">
+        {stageLabels[stage] ?? stage}
+      </p>
+      <p className="mt-1 text-[11px] uppercase tracking-[0.2em] text-[#64748B]">
+        Project analysis pipeline
+      </p>
     </div>
   )
 }

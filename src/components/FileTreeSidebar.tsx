@@ -128,7 +128,7 @@ const FileTreeNode = ({
     <li>
       <button
         type="button"
-        className={`flex h-7 w-full items-center gap-1.5 rounded px-2 text-left text-[13px] transition-colors duration-150 hover:bg-[#17203A] focus:outline-none focus:ring-1 focus:ring-cyan-400 ${
+        className={`flex h-7 w-full items-center gap-1.5 rounded px-2 text-left text-[13px] transition duration-150 hover:bg-[#17203A] hover:text-white focus:outline-none focus:ring-1 focus:ring-cyan-400 ${
           isActive
             ? 'bg-[#1D2B4F] text-white'
             : isFolder
@@ -213,7 +213,7 @@ const FileTreeSidebar = ({
   }
 
   return (
-    <aside className="flex min-h-0 max-h-48 w-full shrink-0 flex-col rounded-2xl border border-[#1E293B] bg-[#0F172A] shadow-[0_20px_45px_-30px_rgba(15,23,42,0.9)] lg:max-h-none lg:w-64">
+    <aside className="obsera-panel-in flex min-h-0 max-h-48 w-full shrink-0 flex-col rounded-2xl border border-[#1E293B] bg-[#0F172A] shadow-[0_20px_45px_-30px_rgba(15,23,42,0.9)] transition-colors duration-200 lg:max-h-none lg:w-64">
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0 px-3 py-3">
           <p className="truncate text-sm font-semibold uppercase tracking-[0.24em] text-[#A6B0CF]">

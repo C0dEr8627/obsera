@@ -6,11 +6,17 @@ interface InspectorSectionProps {
   children: ReactNode
 }
 
-const InspectorSection = ({ title, description, children }: InspectorSectionProps) => (
-  <section className="space-y-3 rounded-2xl border border-[#1E293B] bg-[#111827]/80 p-4">
+const InspectorSection = ({
+  title,
+  description,
+  children,
+}: InspectorSectionProps) => (
+  <section className="space-y-3 rounded-2xl border border-[#1E293B] bg-[#111827]/80 p-4 transition-colors duration-150 hover:border-[#2B3A55]">
     <div className="space-y-1">
       <p className="text-sm font-semibold text-white">{title}</p>
-      {description ? <p className="text-xs text-[#94A3B8]">{description}</p> : null}
+      {description ? (
+        <p className="text-xs text-[#94A3B8]">{description}</p>
+      ) : null}
     </div>
     <div className="space-y-3 text-sm text-[#CBD5E1]">{children}</div>
   </section>
