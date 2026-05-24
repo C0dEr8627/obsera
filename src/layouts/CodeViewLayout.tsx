@@ -48,7 +48,7 @@ const CodeViewLayout = () => {
     : 'Select a source file from the file tree to preview its contents.'
 
   return (
-    <main className="flex min-h-0 flex-1 overflow-auto px-3 py-3 sm:px-5 sm:py-4">
+    <main className="obsera-fade-in flex min-h-0 flex-1 overflow-auto px-3 py-3 sm:px-5 sm:py-4">
       <div className="flex min-h-0 flex-1 flex-col gap-3 lg:flex-row">
         <FileTreeSidebar
           title={zipFileName || 'File Explorer'}
@@ -57,7 +57,7 @@ const CodeViewLayout = () => {
           onSelectFile={setActiveFileId}
         />
 
-        <section className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-[#1E293B] bg-[#111827] shadow-[0_24px_50px_-30px_rgba(0,0,0,0.7)]">
+        <section className="obsera-panel-in flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-[#1E293B] bg-[#111827] shadow-[0_24px_50px_-30px_rgba(0,0,0,0.7)] transition-colors duration-200">
           <div className="shrink-0 border-b border-[#1E293B] px-4 py-3 sm:px-5">
             <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
               <div>
