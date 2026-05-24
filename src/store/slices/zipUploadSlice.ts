@@ -24,8 +24,19 @@ export interface ZipUploadSlice {
     ignoredFileCount: number,
     sampleFileName: string | null,
   ) => void
-  rejectZipFile: (message: string) => void
+  rejectZipFile: (
+    message: string,
+    previousUpload?: ZipUploadSnapshot | null,
+  ) => void
   resetZipUpload: () => void
+}
+
+export interface ZipUploadSnapshot {
+  zipFileName: string | null
+  zipFileSize: number | null
+  zipFileCount: number | null
+  zipIgnoredFileCount: number | null
+  zipSampleFileName: string | null
 }
 
 export const createZipUploadSlice: StateCreator<
@@ -70,13 +81,13 @@ export const createZipUploadSlice: StateCreator<
       zipUploadStatus: 'ready',
       zipUploadError: null,
     }),
-  rejectZipFile: (message) =>
+  rejectZipFile: (message, previousUpload) =>
     set({
-      zipFileName: null,
-      zipFileSize: null,
-      zipFileCount: null,
-      zipIgnoredFileCount: null,
-      zipSampleFileName: null,
+      zipFileName: previousUpload?.zipFileName ?? null,
+      zipFileSize: previousUpload?.zipFileSize ?? null,
+      zipFileCount: previousUpload?.zipFileCount ?? null,
+      zipIgnoredFileCount: previousUpload?.zipIgnoredFileCount ?? null,
+      zipSampleFileName: previousUpload?.zipSampleFileName ?? null,
       zipUploadStatus: 'error',
       zipUploadError: message,
     }),

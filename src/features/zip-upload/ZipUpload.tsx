@@ -1,6 +1,10 @@
 import { type ChangeEvent, type DragEvent, useRef } from 'react'
 import { useAppStore } from '@/store'
-import { readZipSummary } from '@/features/zip-upload/zipReader'
+import {
+  getZipUploadErrorMessage,
+  readZipSummary,
+  validateZipFileCandidate,
+} from '@/features/zip-upload/zipReader'
 
 const acceptedZipMimeTypes = new Set([
   'application/zip',
@@ -15,13 +19,6 @@ const formatFileSize = (sizeInBytes: number | null) => {
 
   const sizeInMb = sizeInBytes / 1024 / 1024
   return `${sizeInMb.toFixed(sizeInMb >= 10 ? 0 : 1)} MB`
-}
-
-const isZipFile = (file: File) => {
-  const hasZipName = file.name.toLowerCase().endsWith('.zip')
-  const hasZipType = file.type === '' || acceptedZipMimeTypes.has(file.type)
-
-  return hasZipName && hasZipType
 }
 
 interface ZipUploadProps {
@@ -52,11 +49,15 @@ const ZipUpload = ({ compact = false }: ZipUploadProps) => {
   )
   const setZipUploadIdle = useAppStore((state) => state.setZipUploadIdle)
 
+  const readyStatusText =
+    zipFileName && zipFileCount !== null
+      ? `${zipFileName}${zipFileSize ? ` - ${formatFileSize(zipFileSize)}` : ''} - ${zipFileCount} files loaded${zipIgnoredFileCount ? ` - ${zipIgnoredFileCount} ignored` : ''}`
+      : null
   const uploadStatusText =
-    zipUploadStatus === 'ready' && zipFileName
-      ? `${zipFileName}${zipFileSize ? ` - ${formatFileSize(zipFileSize)}` : ''}${zipFileCount !== null ? ` - ${zipFileCount} files loaded` : ''}${zipIgnoredFileCount ? ` - ${zipIgnoredFileCount} ignored` : ''}`
-      : zipUploadStatus === 'error'
-        ? zipUploadError
+    zipUploadStatus === 'error'
+      ? zipUploadError
+      : zipUploadStatus === 'ready' && readyStatusText
+        ? readyStatusText
         : zipUploadStatus === 'validating'
           ? `Reading ${zipFileName ?? 'ZIP file'}...`
           : zipUploadStatus === 'dragging'
@@ -68,20 +69,34 @@ const ZipUpload = ({ compact = false }: ZipUploadProps) => {
       return
     }
 
-    if (!isZipFile(file)) {
-      rejectZipFile('Only .zip files are supported.')
+    const previousUpload =
+      zipFileName && zipFileCount !== null
+        ? {
+            zipFileName,
+            zipFileSize,
+            zipFileCount,
+            zipIgnoredFileCount,
+            zipSampleFileName,
+          }
+        : null
+    const validationError = validateZipFileCandidate(file, acceptedZipMimeTypes)
+
+    if (validationError) {
+      rejectZipFile(validationError, previousUpload)
+      setProcessingError(validationError)
       return
     }
 
     setZipUploadValidating(file)
-    try {
-      setProcessingStage('uploading', { percent: 2, message: 'Uploading ZIP' })
-    } catch {}
+    setProcessingStage('uploading', { percent: 2, message: 'Uploading ZIP' })
 
     try {
       const summary = await readZipSummary(file)
       setFileTree(summary.fileTree)
-      setDependencyGraph(summary.dependencyGraph.nodes, summary.dependencyGraph.edges)
+      setDependencyGraph(
+        summary.dependencyGraph.nodes,
+        summary.dependencyGraph.edges,
+      )
       setZipTechStack(summary.techStack)
       acceptZipFile(
         file,
@@ -89,15 +104,11 @@ const ZipUpload = ({ compact = false }: ZipUploadProps) => {
         summary.ignoredFileCount,
         summary.sampleFileName,
       )
-      try {
-        setProcessingStage('completed', { percent: 100, message: 'Ready' })
-      } catch {}
-    } catch {
-      setZipTechStack([])
-      try {
-        setProcessingError('ZIP could not be read. Choose a valid ZIP archive.')
-      } catch {}
-      rejectZipFile('ZIP could not be read. Choose a valid ZIP archive.')
+      setProcessingStage('completed', { percent: 100, message: 'Ready' })
+    } catch (error) {
+      const message = getZipUploadErrorMessage(error)
+      setProcessingError(message)
+      rejectZipFile(message, previousUpload)
     }
   }
 

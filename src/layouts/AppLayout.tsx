@@ -9,7 +9,11 @@ import ErrorBoundary from '@/components/error/ErrorBoundary'
 
 const AppLayout = () => {
   const { activeView, setActiveView } = useWorkspaceView()
-  const isZipReady = useAppStore((state) => state.zipUploadStatus === 'ready')
+  const isZipReady = useAppStore(
+    (state) =>
+      state.zipUploadStatus === 'ready' ||
+      (state.zipUploadStatus === 'error' && state.zipFileCount !== null),
+  )
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-[#0B1020] text-[#E6EAF5]">

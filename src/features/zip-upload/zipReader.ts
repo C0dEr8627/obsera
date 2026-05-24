@@ -5,12 +5,17 @@ import {
   type ExtractedFileInput,
 } from '@/utils/fileTreeGenerator'
 import {
-    buildDependencyGraph,
-    type DependencyGraphData,
-  } from '@/utils/dependencyGraphGenerator'
+  buildDependencyGraph,
+  type DependencyGraphData,
+} from '@/utils/dependencyGraphGenerator'
 import { useAppStore } from '@/store'
-import { analyzeFiles, dependencyScan, generateGraph } from '@/workers/workerClient'
+import {
+  analyzeFiles,
+  dependencyScan,
+  generateGraph,
+} from '@/workers/workerClient'
 import type { TechStackItem } from '@/features/tech-stack/types'
+import type { ProcessingProgress } from '@/features/processing/types'
 
 export interface ZipReadSummary {
   fileCount: number
@@ -20,6 +25,52 @@ export interface ZipReadSummary {
   fileTree: FileNode[]
   dependencyGraph: DependencyGraphData
   techStack: TechStackItem[]
+}
+
+type ZipReadErrorCode =
+  | 'invalid-type'
+  | 'empty-file'
+  | 'corrupted'
+  | 'empty-archive'
+  | 'no-readable-files'
+  | 'extraction-failed'
+
+export class ZipReadError extends Error {
+  code: ZipReadErrorCode
+  userMessage: string
+
+  constructor(code: ZipReadErrorCode, userMessage: string) {
+    super(userMessage)
+    this.name = 'ZipReadError'
+    this.code = code
+    this.userMessage = userMessage
+  }
+}
+
+export const validateZipFileCandidate = (
+  file: File,
+  acceptedMimeTypes: ReadonlySet<string>,
+): string | null => {
+  const hasZipName = file.name.toLowerCase().endsWith('.zip')
+  const hasZipType = file.type === '' || acceptedMimeTypes.has(file.type)
+
+  if (!hasZipName || !hasZipType) {
+    return 'Only .zip files are supported.'
+  }
+
+  if (file.size === 0) {
+    return 'Invalid ZIP file.'
+  }
+
+  return null
+}
+
+export const getZipUploadErrorMessage = (error: unknown) => {
+  if (error instanceof ZipReadError) {
+    return error.userMessage
+  }
+
+  return 'Unable to extract project contents.'
 }
 
 const ignoredDirectoryNames = new Set([
@@ -216,21 +267,55 @@ const isSupportedFilePath = (path: string) => {
 
 const isSupportedFolderPath = (path: string) => !isIgnoredPath(path)
 
-export const readZipSummary = async (file: File): Promise<ZipReadSummary> => {
-  const setStage = useAppStore.getState().setStage
+const readArchive = async (file: File) => {
   try {
-    setStage('extracting', { percent: 5, message: 'Opening archive' })
-  } catch {}
+    return await JSZip.loadAsync(await file.arrayBuffer())
+  } catch {
+    throw new ZipReadError('corrupted', 'Uploaded archive appears corrupted.')
+  }
+}
 
-  const archive = await JSZip.loadAsync(await file.arrayBuffer())
+const readTextEntry = async (entry: JSZip.JSZipObject) => {
+  try {
+    return await entry.async('string')
+  } catch {
+    throw new ZipReadError(
+      'extraction-failed',
+      'Unable to extract project contents.',
+    )
+  }
+}
+
+export const readZipSummary = async (file: File): Promise<ZipReadSummary> => {
+  if (!file.name.toLowerCase().endsWith('.zip') || file.size === 0) {
+    throw new ZipReadError('invalid-type', 'Invalid ZIP file.')
+  }
+
+  const setStage = useAppStore.getState().setStage
+  setStage('extracting', { percent: 5, message: 'Opening archive' })
+
+  const archive = await readArchive(file)
   const folders = Object.values(archive.files).filter((entry) => {
     const path = normalizeZipPath(entry.name)
     return entry.dir && path && isSupportedFolderPath(path)
   })
   const allFiles = Object.values(archive.files).filter((entry) => !entry.dir)
+
+  if (allFiles.length === 0) {
+    throw new ZipReadError('empty-archive', 'Invalid ZIP file.')
+  }
+
   const files = allFiles.filter((entry) =>
     isSupportedFilePath(normalizeZipPath(entry.name)),
   )
+
+  if (files.length === 0) {
+    throw new ZipReadError(
+      'no-readable-files',
+      'Unable to extract project contents.',
+    )
+  }
+
   const sampleFile = files[0] ?? null
   const extractedFiles: ExtractedFileInput[] = []
 
@@ -238,7 +323,7 @@ export const readZipSummary = async (file: File): Promise<ZipReadSummary> => {
   for (let i = 0; i < totalFiles; i++) {
     const entry = files[i]
     const path = normalizeZipPath(entry.name)
-    const content = await entry.async('string')
+    const content = await readTextEntry(entry)
     const fileName = getPathParts(path).at(-1) ?? ''
 
     extractedFiles.push({
@@ -250,42 +335,46 @@ export const readZipSummary = async (file: File): Promise<ZipReadSummary> => {
       },
     })
 
-    // update parsing progress incrementally
-    try {
-      const percent = Math.round(30 + ((i + 1) / Math.max(1, totalFiles)) * 35) // 30 -> 65
-      setStage('parsing', { percent, message: `Parsing files (${i + 1}/${totalFiles})` })
-    } catch {}
+    const percent = Math.round(30 + ((i + 1) / Math.max(1, totalFiles)) * 35)
+    setStage('parsing', {
+      percent,
+      message: `Parsing files (${i + 1}/${totalFiles})`,
+    })
   }
 
-  try {
-    setStage('generatingGraph', { percent: 65, message: 'Delegating analysis to worker' })
-  } catch {}
+  setStage('generatingGraph', {
+    percent: 65,
+    message: 'Delegating analysis to worker',
+  })
 
-  let techStack: TechStackItem[] = []
+  let techStack: TechStackItem[]
   let dependencyGraph: DependencyGraphData
 
   try {
     // run dependency scan in worker and stream progress
     await dependencyScan(
       extractedFiles.map((f) => ({ path: f.path, content: f.content })),
-      (progress: any) => {
-        try {
-          setStage('parsing', { percent: progress.percent, message: progress.message })
-        } catch {}
+      (progress: ProcessingProgress) => {
+        setStage('parsing', {
+          percent: progress.percent,
+          message: progress.message,
+        })
       },
     )
 
     // notify graph generation
-    try {
-      setStage('generatingGraph', { percent: 60, message: 'Worker: generating graph' })
-    } catch {}
+    setStage('generatingGraph', {
+      percent: 60,
+      message: 'Worker: generating graph',
+    })
 
     const graphResult = await generateGraph(
       extractedFiles.map((f) => ({ path: f.path, content: f.content })),
-      (progress: any) => {
-        try {
-          setStage('generatingGraph', { percent: progress.percent, message: progress.message })
-        } catch {}
+      (progress: ProcessingProgress) => {
+        setStage('generatingGraph', {
+          percent: progress.percent,
+          message: progress.message,
+        })
       },
     )
 
@@ -296,49 +385,52 @@ export const readZipSummary = async (file: File): Promise<ZipReadSummary> => {
       const analysis = await analyzeFiles(
         extractedFiles.map((f) => ({ path: f.path, content: f.content })),
         (progress) => {
-          try {
-            setStage('detectingTechStack', { percent: progress.percent, message: progress.message })
-          } catch {}
+          setStage('detectingTechStack', {
+            percent: progress.percent,
+            message: progress.message,
+          })
         },
       )
 
       techStack = analysis.techStack
-    } catch (e) {
+    } catch {
       // fallback local detection
       try {
-        const detect = await import('@/features/tech-stack/utils/detectTechStack')
-        techStack = detect.detectTechStack(extractedFiles as any)
+        const detect =
+          await import('@/features/tech-stack/utils/detectTechStack')
+        techStack = detect.detectTechStack(extractedFiles)
       } catch {
         techStack = []
       }
     }
-  } catch (e) {
-    try {
-      useAppStore.getState().setError(String(e ?? 'Worker analysis failed'))
-      setStage('error')
-    } catch {}
+  } catch {
+    setStage('generatingGraph', {
+      percent: 70,
+      message: 'Worker unavailable, using local analysis',
+    })
     // fallback to local processing to remain resilient
     dependencyGraph = buildDependencyGraph(
-      extractedFiles.map((file) => ({ path: file.path, content: file.content ?? '' })),
+      extractedFiles.map((file) => ({
+        path: file.path,
+        content: file.content ?? '',
+      })),
     )
     try {
       // attempt local detection as fallback
       const detect = await import('@/features/tech-stack/utils/detectTechStack')
-      techStack = detect.detectTechStack(extractedFiles as any)
+      techStack = detect.detectTechStack(extractedFiles)
     } catch {
       techStack = []
     }
   }
 
-  try {
-    setStage('completed', { percent: 100, message: 'Analysis complete' })
-  } catch {}
+  setStage('completed', { percent: 100, message: 'Analysis complete' })
 
   return {
     fileCount: files.length,
     ignoredFileCount: allFiles.length - files.length,
     sampleFileName: sampleFile?.name ?? null,
-    sampleFileContent: sampleFile ? await sampleFile.async('string') : null,
+    sampleFileContent: extractedFiles[0]?.content ?? null,
     fileTree: buildFileTree({
       folders: folders.map((entry) => ({
         path: normalizeZipPath(entry.name),
