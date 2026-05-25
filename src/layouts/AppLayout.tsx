@@ -20,7 +20,9 @@ const AppLayout = () => {
       <header className="flex shrink-0 flex-col gap-2 border-b border-[var(--obsera-border)] bg-[#121A33] px-4 py-3 sm:h-14 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-0">
         <h1 className="text-lg font-semibold tracking-wide">Obsera</h1>
 
-        <TopNavigation activeView={activeView} onChange={setActiveView} />
+        {isZipReady && (
+          <TopNavigation activeView={activeView} onChange={setActiveView} />
+        )}
       </header>
 
       <ProcessingOverlay />

@@ -155,7 +155,11 @@ const GraphCanvas = ({
             className="obsera-focus-ring rounded-md border border-[#213045] bg-[#0F172A]/80 px-3 py-1.5 text-xs font-medium text-[#D7DEEC] transition duration-150 hover:border-cyan-400/40 hover:bg-[#142B47] hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
             title="Recalculate graph layout"
           >
-            ⚡ Relayout
+            <svg className="inline-block w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+              <path d="M21 12a9 9 0 10-2.6 6.06" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M21 3v6h-6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            <span>Relayout</span>
           </button>
 
           {/* Reset view button */}
@@ -166,7 +170,11 @@ const GraphCanvas = ({
             className="obsera-focus-ring rounded-md border border-[#213045] bg-[#0F172A]/80 px-3 py-1.5 text-xs font-medium text-[#D7DEEC] transition duration-150 hover:border-cyan-400/40 hover:bg-[#142B47] hover:text-white"
             title="Reset to fit all nodes"
           >
-            🏠 Home
+            <svg className="inline-block w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+              <path d="M3 11.5L12 4l9 7.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M9 21V12h6v9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            <span>Home</span>
           </button>
 
           {/* Zoom controls */}
@@ -176,7 +184,9 @@ const GraphCanvas = ({
             onClick={handleZoomIn}
             className="obsera-focus-ring rounded-md border border-[#213045] bg-[#0F172A]/80 px-2 py-1 text-xs font-medium text-[#D7DEEC] transition duration-150 hover:border-cyan-400/40 hover:bg-[#142B47] hover:text-white"
           >
-            +
+            <svg className="inline-block w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+              <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
           </button>
           <button
             type="button"
@@ -184,7 +194,9 @@ const GraphCanvas = ({
             onClick={handleZoomOut}
             className="obsera-focus-ring rounded-md border border-[#213045] bg-[#0F172A]/80 px-2 py-1 text-xs font-medium text-[#D7DEEC] transition duration-150 hover:border-cyan-400/40 hover:bg-[#142B47] hover:text-white"
           >
-            −
+            <svg className="inline-block w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+              <path d="M5 12h14" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
           </button>
         </div>
       </div>
