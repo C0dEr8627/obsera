@@ -1,7 +1,3 @@
-interface HeroSectionProps {
-  onUploadClick: () => void
-}
-
 const graphNodes = [
   'left-[12%] top-[24%]',
   'left-[24%] top-[58%]',
@@ -57,18 +53,9 @@ const HeroSection = ({ onUploadClick }: HeroSectionProps) => (
           and focused module insight without sending your code away.
         </p>
 
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-          <button
-            type="button"
-            onClick={onUploadClick}
-            className="obsera-focus-ring h-11 rounded-md bg-[#2D3A8C] px-5 text-sm font-semibold text-white transition duration-150 hover:bg-[#3648AD] hover:shadow-[0_0_26px_rgba(34,211,238,0.16)]"
-          >
-            Upload ZIP File
-          </button>
-          <p className="text-sm text-[#8EA1C3]">
-            Local-first analysis for private repositories and prototypes.
-          </p>
-        </div>
+        <p className="mt-8 max-w-xl text-sm text-[#8EA1C3]">
+          Local-first analysis for private repositories and prototypes.
+        </p>
       </div>
     </div>
   </section>
