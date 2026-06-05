@@ -9,19 +9,26 @@ const workflowItems = [
 ]
 
 const CTASection = ({ onUploadClick }: CTASectionProps) => (
-  <section className="obsera-surface p-5 sm:p-6">
-    <p className="text-sm font-semibold text-white">Start privately</p>
-    <p className="mt-3 text-sm leading-6 text-[#A6B0CF]">
-      Upload a ZIP from your machine and begin exploring structure, imports,
-      and relationships in the same browser session.
-    </p>
-    <button
-      type="button"
-      onClick={onUploadClick}
-      className="obsera-focus-ring mt-5 h-10 rounded-md border border-cyan-300/30 bg-cyan-300/10 px-4 text-sm font-semibold text-cyan-100 transition hover:border-cyan-300/60 hover:bg-cyan-300/16 hover:text-white"
-    >
-      Upload ZIP File
-    </button>
+  <section className="flex h-full min-h-[320px] items-center lg:min-h-[calc(100svh-10rem)]">
+    <div className="w-full rounded-3xl border border-white/10 bg-[#07111F]/90 p-6 shadow-[0_24px_60px_-36px_rgba(14,165,233,0.45)] backdrop-blur sm:p-8">
+      <p className="inline-flex rounded-full border border-cyan-300/20 bg-cyan-300/8 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-cyan-100">
+        Start privately
+      </p>
+      <h2 className="mt-4 text-2xl font-semibold tracking-tight text-white sm:text-[1.9rem]">
+        Upload a ZIP and begin in the browser.
+      </h2>
+      <p className="mt-4 max-w-md text-base leading-7 text-[#A6B0CF]">
+        Use your local project archive to explore structure, imports, and
+        relationships without sending code to a remote service.
+      </p>
+      <button
+        type="button"
+        onClick={onUploadClick}
+        className="obsera-focus-ring mt-6 inline-flex h-12 items-center rounded-md bg-[#2D3A8C] px-5 text-sm font-semibold text-white transition duration-150 hover:bg-[#3648AD] hover:shadow-[0_0_26px_rgba(34,211,238,0.16)]"
+      >
+        Upload ZIP File
+      </button>
+    </div>
   </section>
 )
 
