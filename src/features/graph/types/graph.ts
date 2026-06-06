@@ -5,6 +5,7 @@ export interface GraphNodeData {
   label: string
   path: string
   fileType?: string
+  isIsolated?: boolean
   metadata?: Record<string, unknown>
 }
 

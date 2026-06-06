@@ -35,7 +35,7 @@ const HeroGraphScene = () => (
   </div>
 )
 
-const HeroSection = ({ onUploadClick }: HeroSectionProps) => (
+const HeroSection = () => (
   <section className="relative isolate flex min-h-[calc(100svh-10rem)] items-center overflow-hidden px-4 py-16 sm:px-6 sm:py-20">
     <HeroGraphScene />
     <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[var(--obsera-bg)] to-transparent" />

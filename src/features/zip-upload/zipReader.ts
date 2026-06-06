@@ -96,6 +96,9 @@ const ignoredDirectoryNames = new Set([
 
 const ignoredFileNames = new Set([
   '.ds_store',
+  '.gitignore',
+  '.npmrc',
+  '.prettierrc',
   'bun.lockb',
   'cargo.lock',
   'composer.lock',
@@ -132,9 +135,12 @@ const ignoredExtensions = new Set([
   '.jar',
   '.jpeg',
   '.jpg',
+  '.json',
   '.keystore',
   '.lockb',
   '.mov',
+  '.md',
+  '.mdx',
   '.mp3',
   '.mp4',
   '.o',
@@ -151,6 +157,8 @@ const ignoredExtensions = new Set([
   '.webp',
   '.woff',
   '.woff2',
+  '.yaml',
+  '.yml',
   '.zip',
 ])
 
@@ -163,7 +171,6 @@ const supportedExtensions = new Set([
   '.css',
   '.csv',
   '.dart',
-  '.env',
   '.go',
   '.graphql',
   '.h',
@@ -171,14 +178,11 @@ const supportedExtensions = new Set([
   '.html',
   '.java',
   '.js',
-  '.json',
   '.jsx',
   '.kt',
   '.less',
   '.log',
   '.lua',
-  '.md',
-  '.mdx',
   '.mjs',
   '.php',
   '.plist',
@@ -198,15 +202,11 @@ const supportedExtensions = new Set([
   '.txt',
   '.vue',
   '.xml',
-  '.yaml',
-  '.yml',
 ])
 
+const ignoredConfigPrefixes = ['.env']
+
 const supportedExtensionlessFileNames = new Set([
-  '.env',
-  '.env.example',
-  '.gitignore',
-  '.prettierrc',
   'dockerfile',
   'license',
   'makefile',
@@ -255,7 +255,11 @@ const isSupportedFilePath = (path: string) => {
 
   const extension = getFileExtension(fileName)
 
-  if (ignoredExtensions.has(extension)) {
+  if (
+    ignoredExtensions.has(extension) ||
+    ignoredFileNames.has(fileName) ||
+    ignoredConfigPrefixes.some((prefix) => fileName.startsWith(prefix))
+  ) {
     return false
   }
 
